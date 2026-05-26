@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - SOP PPNP</title>
+    <style>
+        :root {
+            --color-dark: #0D2B1D;
+            --color-primary: #345635;
+            --color-secondary: #6B8F71;
+            --color-accent: #AEC3B0;
+            --color-light: #E3EFD3;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: var(--color-light); margin: 0; }
+        .login-box { background: white; padding: 40px 30px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 350px; text-align: center; border-top: 5px solid var(--color-dark); }
+        .login-box img { height: 80px; margin-bottom: 15px; }
+        .login-box h2 { margin: 0 0 5px 0; color: var(--color-dark); }
+        .login-box p { color: var(--color-secondary); font-size: 0.9rem; margin-bottom: 25px; }
+        
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--color-primary); font-size: 0.9rem;}
+        input[type="text"], input[type="password"] { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid var(--color-accent); border-radius: 5px; background: #fdfdfd; transition: 0.3s;}
+        input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 5px var(--color-accent); }
+        
+        button { width: 100%; padding: 12px; background: var(--color-primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: 0.3s;}
+        button:hover { background: var(--color-dark); }
+        
+        .error { color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px; border: 1px solid #f5c6cb;}
+        .back-link { display: block; margin-top: 20px; text-decoration: none; color: var(--color-secondary); font-size: 14px; }
+        .back-link:hover { color: var(--color-dark); text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <img src="https://res.cloudinary.com/dvul7dq3b/image/upload/v1770688661/logo_1_hhnqy2.png" alt="Logo">
+        <h2>Panel Admin</h2>
+        <p>Politeknik Pertanian Negeri Payakumbuh</p>
+        
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form action="{{ url_for('login') }}" method="POST">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required placeholder="Masukkan username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="Masukkan password">
+            </div>
+            <button type="submit">Masuk ke Sistem</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="back-link">&larr; Kembali ke Halaman Depan</a>
+    </div>
+
+</body>
+</html>

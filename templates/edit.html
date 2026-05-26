@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit SOP - Admin</title>
+    <style>
+        :root {
+            --color-dark: #0D2B1D;
+            --color-primary: #345635;
+            --color-secondary: #6B8F71;
+            --color-accent: #AEC3B0;
+            --color-light: #E3EFD3;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; border-top: 5px solid var(--color-secondary); }
+        .card h2 { margin-top: 0; color: var(--color-dark); border-bottom: 2px solid var(--color-light); padding-bottom: 10px; margin-bottom: 20px;}
+        
+        .form-group { margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-bottom: 8px; color: var(--color-primary); }
+        input[type="text"], input[type="file"] { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; background: #fafafa; }
+        
+        .note { font-size: 12px; color: #777; margin-top: 5px; background: var(--color-light); padding: 8px; border-radius: 4px; border-left: 3px solid var(--color-secondary);}
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        button[type="submit"] { flex: 1; padding: 12px; background: #ffc107; color: black; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: bold; }
+        button[type="submit"]:hover { background: #e0a800; }
+        .btn-cancel { flex: 1; padding: 12px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; text-align: center; font-size: 15px; font-weight: bold; box-sizing: border-box;}
+        .btn-cancel:hover { background: #5a6268; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>✏️ Edit Dokumen SOP</h2>
+
+        <form action="{{ url_for('edit_sop', id=sop['id']) }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Judul SOP:</label>
+                <input type="text" name="judul" value="{{ sop['judul'] }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Ganti File Dokumen (Opsional):</label>
+                <input type="file" name="file" accept="application/pdf">
+                <div class="note">
+                    *Kosongkan jika tidak ingin mengganti file. <br>
+                    *File saat ini: <strong>{{ sop['filename'] }}</strong>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit">Simpan Perubahan</button>
+                <a href="{{ url_for('admin') }}" class="btn-cancel">Batal</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
