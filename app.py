@@ -2,13 +2,14 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = 'ganti_dengan_rahasia_anda_nanti' 
-
-ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'password123'
+app.secret_key = os.environ.get('SECRET_KEY', 'fallback_key')
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
