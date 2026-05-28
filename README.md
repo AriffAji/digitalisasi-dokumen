@@ -1,5 +1,7 @@
 # 📁 SIADIK
+
 ### Sistem Informasi Arsip Digital Kepegawaian
+
 **Politeknik Pertanian Negeri Payakumbuh (PPNP)**
 
 ---
@@ -55,12 +57,14 @@ SIADIK adalah platform digital terpusat untuk mengelola arsip dokumen kepegawaia
 ## 🚀 Instalasi
 
 ### 1. Clone repository
+
 ```bash
 git clone https://github.com/AriffAji/digitalisasi-dokumen.git
 cd digitalisasi-dokumen
 ```
 
 ### 2. Buat virtual environment
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # Mac/Linux
@@ -68,11 +72,13 @@ venv\Scripts\activate     # Windows
 ```
 
 ### 3. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Setup environment
+
 ```bash
 # Salin file contoh
 cp .env.example .env
@@ -84,6 +90,7 @@ python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
 ### 5. Jalankan aplikasi
+
 ```bash
 python app.py
 ```
@@ -162,5 +169,5 @@ dokumen      → id, sub_kamar_id, nomor_dokumen, judul, file_path,
 
 ## 👨‍💻 Developer
 
-Dikembangkan oleh Tim IT **PPNP** — Politeknik Pertanian Negeri Payakumbuh
+Dikembangkan oleh Tim Kepegawaian **PPNP** — Politeknik Pertanian Negeri Payakumbuh
 © 2026 SIADIK. Hak cipta dilindungi.
