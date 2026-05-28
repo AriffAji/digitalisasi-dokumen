@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}{{ sub_kamar.nama }}{% endblock %}
+
+{% block breadcrumb %}
+<div class="bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <nav class="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
+      <a href="{{ url_for('public.index') }}" class="hover:text-hijau-600 flex items-center gap-1 transition-colors">
+        <span class="material-icons-round" style="font-size:16px;">home</span> Beranda
+      </a>
+      <span class="material-icons-round text-gray-300" style="font-size:16px;">chevron_right</span>
+      <a href="{{ url_for('public.kamar', kamar_id=kamar.id) }}" class="hover:text-hijau-600 transition-colors">
+        {{ kamar.nama }}
+      </a>
+      <span class="material-icons-round text-gray-300" style="font-size:16px;">chevron_right</span>
+      <span class="text-hijau-600 font-semibold">{{ sub_kamar.nama }}</span>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <p class="text-gray-400 text-sm flex items-center gap-1 mb-1">
+      <span class="material-icons-round" style="font-size:14px;">folder_special</span>
+      {{ kamar.nama }}
+    </p>
+    <h1 class="text-2xl font-extrabold text-gray-800 flex items-center gap-2">
+      <span class="material-icons-round text-hijau-600" style="font-size:28px;">folder</span>
+      {{ sub_kamar.nama }}
+    </h1>
+    <p class="text-gray-500 text-sm mt-1">{{ dokumen_list|length }} dokumen ditemukan</p>
+  </div>
+
+  <!-- Filter Bar -->
+  <form method="GET" action="" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+    <div class="flex flex-col sm:flex-row gap-3">
+
+      <!-- Cari -->
+      <div class="relative flex-1">
+        <span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" style="font-size:18px;">search</span>
+        <input type="text" name="cari" value="{{ cari }}"
+               placeholder="Cari judul atau nomor dokumen..."
+               class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500 bg-gray-50" />
+      </div>
+
+      <!-- Filter Tahun -->
+      <div class="relative">
+        <span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" style="font-size:16px;">calendar_today</span>
+        <select name="tahun"
+                class="pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500 bg-gray-50 appearance-none cursor-pointer min-w-[130px]">
+          <option value="">Semua Tahun</option>
+          {% for t in tahun_list %}
+          <option value="{{ t }}" {{ 'selected' if tahun == t|string }}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Filter Status -->
+      <div class="relative">
+        <span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" style="font-size:16px;">toggle_on</span>
+        <select name="status"
+                class="pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500 bg-gray-50 appearance-none cursor-pointer min-w-[140px]">
+          <option value="">Semua Status</option>
+          <option value="aktif" {{ 'selected' if filter_status == 'aktif' }}>Aktif</option>
+          <option value="arsip" {{ 'selected' if filter_status == 'arsip' }}>Arsip</option>
+        </select>
+      </div>
+
+      <!-- Tombol Filter & Reset -->
+      <div class="flex gap-2">
+        <button type="submit"
+                class="bg-hijau-600 hover:bg-hijau-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap">
+          <span class="material-icons-round" style="font-size:16px;">filter_alt</span>
+          Filter
+        </button>
+        {% if cari or tahun or filter_status %}
+        <a href="{{ url_for('public.dokumen', kamar_id=kamar.id, sub_kamar_id=sub_kamar.id) }}"
+           class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap">
+          <span class="material-icons-round" style="font-size:16px;">close</span>
+          Reset
+        </a>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Active filters badge -->
+    {% if cari or tahun or filter_status %}
+    <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
+      <span class="text-xs text-gray-400 font-medium flex items-center gap-1">
+        <span class="material-icons-round" style="font-size:14px;">filter_list</span> Filter aktif:
+      </span>
+      {% if cari %}
+      <span class="bg-hijau-50 text-hijau-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+        <span class="material-icons-round" style="font-size:12px;">search</span> "{{ cari }}"
+      </span>
+      {% endif %}
+      {% if tahun %}
+      <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+        <span class="material-icons-round" style="font-size:12px;">calendar_today</span> {{ tahun }}
+      </span>
+      {% endif %}
+      {% if filter_status %}
+      <span class="bg-orange-50 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+        <span class="material-icons-round" style="font-size:12px;">toggle_on</span> {{ filter_status|capitalize }}
+      </span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </form>
+
+  <!-- Info login jika publik -->
+  {% if not current_user.is_authenticated %}
+  <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+    <span class="material-icons-round text-amber-500" style="font-size:20px;">info</span>
+    <p class="text-amber-800 text-sm">
+      Hanya dokumen <strong>publik</strong> yang ditampilkan.
+      <a href="{{ url_for('auth.login') }}" class="text-hijau-600 font-semibold hover:underline">Login</a>
+      untuk melihat semua dokumen termasuk dokumen internal.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- Tabel Dokumen -->
+  {% if dokumen_list %}
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm" id="dokumenTable">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-100">
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">No</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nomor Dokumen</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Judul Dokumen</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Visibilitas</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tanggal</th>
+            <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for dok in dokumen_list %}
+          <tr class="hover:bg-gray-50 transition-colors dokumen-row">
+            <td class="px-6 py-4 text-gray-400 text-xs">{{ loop.index }}</td>
+            <td class="px-6 py-4">
+              <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                {{ dok.nomor_dokumen or '—' }}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <span class="font-medium text-gray-800 dokumen-judul">{{ dok.judul }}</span>
+            </td>
+            <td class="px-6 py-4">
+              {% if dok.status == 'aktif' %}
+              <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Aktif
+              </span>
+              {% else %}
+              <span class="bg-red-100 text-merah-600 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
+                <span class="material-icons-round" style="font-size:12px;">archive</span> Arsip
+              </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4">
+              {% if dok.visibilitas == 'publik' %}
+              <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
+                <span class="material-icons-round" style="font-size:12px;">public</span> Publik
+              </span>
+              {% else %}
+              <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
+                <span class="material-icons-round" style="font-size:12px;">lock</span> Internal
+              </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 text-gray-400 text-xs">
+              {{ dok.created_at.strftime('%d %b %Y') }}
+            </td>
+            <td class="px-6 py-4 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <!-- Preview -->
+                <a href="{{ url_for('public.serve_pdf', filename=dok.file_path) }}"
+                   target="_blank"
+                   title="Preview"
+                   class="inline-flex items-center gap-1.5 bg-hijau-600 hover:bg-hijau-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
+                  <span class="material-icons-round" style="font-size:14px;">visibility</span>
+                  Preview
+                </a>
+                <!-- Download -->
+                <a href="{{ url_for('public.download_pdf', filename=dok.file_path) }}"
+                   title="Download"
+                   class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
+                  <span class="material-icons-round" style="font-size:14px;">download</span>
+                  Unduh
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Kosong -->
+  <div class="text-center py-16 bg-white rounded-2xl border border-gray-100">
+    <span class="material-icons-round text-gray-300" style="font-size:64px;">description</span>
+    <p class="text-gray-500 font-medium mt-4">Belum ada dokumen di sub-kamar ini.</p>
+    <p class="text-gray-400 text-sm mt-1">Dokumen akan ditambahkan oleh admin.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}{% endblock %}

@@ -1,130 +1,65 @@
 import os
-import sqlite3
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session
-from werkzeug.utils import secure_filename
-from dotenv import load_dotenv
-load_dotenv()
+from flask import Flask, render_template
+from flask_login import LoginManager
+from config import config
+from models import db, init_db, User
 
-app = Flask(__name__)
+def create_app(config_name='default'):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
 
-app.secret_key = os.environ.get('SECRET_KEY', 'fallback_key')
-ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
+    # Pastikan folder uploads ada
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    # Init database
+    init_db(app)
 
-def init_db():
-    conn = sqlite3.connect('sop.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS sops (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            judul TEXT NOT NULL,
-            filename TEXT NOT NULL
+    # Init Flask-Login
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Silakan login untuk mengakses halaman ini.'
+    login_manager.login_message_category = 'warning'
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
+    # Daftarkan blueprints
+    from blueprints.public import public_bp
+    from blueprints.auth import auth_bp
+    from blueprints.admin import admin_bp
+    from blueprints.superadmin import superadmin_bp
+
+    app.register_blueprint(public_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(superadmin_bp, url_prefix='/superadmin')
+
+    # Error handlers
+    @app.errorhandler(403)
+    def forbidden(e):
+        return render_template('403.html'), 403
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return render_template('404.html'), 404
+
+    # Inject variabel global ke semua template
+    @app.context_processor
+    def inject_globals():
+        return dict(
+            SISTEM_NAMA      = app.config['SISTEM_NAMA'],
+            SISTEM_LENGKAP   = app.config['SISTEM_LENGKAP'],
+            INSTANSI_NAMA    = app.config['INSTANSI_NAMA'],
+            INSTANSI_LENGKAP = app.config['INSTANSI_LENGKAP'],
+            TAHUN_FOKUS      = app.config['TAHUN_FOKUS'],
         )
-    ''')
-    conn.commit()
-    conn.close()
 
-init_db()
+    return app
 
-@app.route('/')
-def index():
-    conn = sqlite3.connect('sop.db')
-    conn.row_factory = sqlite3.Row
-    sops = conn.execute('SELECT * FROM sops ORDER BY id DESC').fetchall()
-    conn.close()
-    return render_template('index.html', sops=sops)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
-            session['logged_in'] = True
-            return redirect(url_for('admin'))
-        else:
-            error = "Username atau Password salah!"
-    return render_template('login.html', error=error)
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    return redirect(url_for('index'))
-
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        judul = request.form['judul']
-        file = request.files['file']
-        if file and file.filename.endswith('.pdf'):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            conn = sqlite3.connect('sop.db')
-            conn.execute('INSERT INTO sops (judul, filename) VALUES (?, ?)', (judul, filename))
-            conn.commit()
-            conn.close()
-            return redirect(url_for('admin'))
-            
-    conn = sqlite3.connect('sop.db')
-    conn.row_factory = sqlite3.Row
-    sops = conn.execute('SELECT * FROM sops ORDER BY id DESC').fetchall()
-    conn.close()
-    total_sop = len(sops)
-    return render_template('admin.html', sops=sops, total_sop=total_sop)
-
-@app.route('/delete/<int:id>')
-def delete_sop(id):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    conn = sqlite3.connect('sop.db')
-    conn.row_factory = sqlite3.Row
-    sop = conn.execute('SELECT * FROM sops WHERE id = ?', (id,)).fetchone()
-    if sop:
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], sop['filename'])
-        if os.path.exists(filepath):
-            os.remove(filepath)
-        conn.execute('DELETE FROM sops WHERE id = ?', (id,))
-        conn.commit()
-    conn.close()
-    return redirect(url_for('admin'))
-
-@app.route('/edit/<int:id>', methods=['GET', 'POST'])
-def edit_sop(id):
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    conn = sqlite3.connect('sop.db')
-    conn.row_factory = sqlite3.Row
-    if request.method == 'POST':
-        judul_baru = request.form['judul']
-        file_baru = request.files['file']
-        if file_baru and file_baru.filename.endswith('.pdf'):
-            sop_lama = conn.execute('SELECT * FROM sops WHERE id = ?', (id,)).fetchone()
-            filepath_lama = os.path.join(app.config['UPLOAD_FOLDER'], sop_lama['filename'])
-            if os.path.exists(filepath_lama):
-                os.remove(filepath_lama)
-            filename_baru = secure_filename(file_baru.filename)
-            file_baru.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_baru))
-            conn.execute('UPDATE sops SET judul = ?, filename = ? WHERE id = ?', (judul_baru, filename_baru, id))
-        else:
-            conn.execute('UPDATE sops SET judul = ? WHERE id = ?', (judul_baru, id))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('admin'))
-    sop = conn.execute('SELECT * FROM sops WHERE id = ?', (id,)).fetchone()
-    conn.close()
-    return render_template('edit.html', sop=sop)
-
-@app.route('/uploads/<filename>')
-def serve_pdf(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+app = create_app()
 
 if __name__ == '__main__':
     app.run(debug=True)

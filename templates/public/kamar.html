@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ kamar.nama }}{% endblock %}
+
+{% block breadcrumb %}
+<div class="bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <nav class="flex items-center gap-2 text-sm text-gray-500">
+      <a href="{{ url_for('public.index') }}" class="hover:text-hijau-600 flex items-center gap-1 transition-colors">
+        <span class="material-icons-round" style="font-size:16px;">home</span> Beranda
+      </a>
+      <span class="material-icons-round text-gray-300" style="font-size:16px;">chevron_right</span>
+      <span class="text-hijau-600 font-semibold">{{ kamar.nama }}</span>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header Kamar -->
+  <div class="bg-hijau-600 rounded-2xl p-8 text-white mb-8">
+    <div class="flex items-center gap-4">
+      <div class="bg-white/15 rounded-xl p-3">
+        <span class="material-icons-round" style="font-size:36px;">folder_special</span>
+      </div>
+      <div>
+        <p class="text-green-200 text-sm font-medium mb-1">Kamar Arsip</p>
+        <h1 class="text-2xl font-extrabold">{{ kamar.nama }}</h1>
+        <p class="text-green-100 text-sm mt-1">{{ kamar.deskripsi }}</p>
+      </div>
+    </div>
+    <div class="mt-6 flex items-center gap-4 text-sm text-green-100">
+      <span class="flex items-center gap-1">
+        <span class="material-icons-round" style="font-size:16px;">category</span>
+        {{ sub_kamar_list|length }} Sub-Kamar
+      </span>
+      <span class="flex items-center gap-1">
+        <span class="material-icons-round" style="font-size:16px;">description</span>
+        {{ kamar.total_dokumen }} Dokumen
+      </span>
+    </div>
+  </div>
+
+  <!-- List Sub-Kamar -->
+  {% if sub_kamar_list %}
+  <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+    <span class="material-icons-round text-hijau-600">category</span>
+    Pilih Sub-Kamar
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for sk in sub_kamar_list %}
+    <a href="{{ url_for('public.dokumen', kamar_id=kamar.id, sub_kamar_id=sk.id) }}"
+       class="group bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 p-5 flex items-center gap-4">
+      <div class="bg-hijau-50 group-hover:bg-hijau-100 rounded-xl p-2.5 transition-colors">
+        <span class="material-icons-round text-hijau-600" style="font-size:24px;">folder</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <h3 class="font-semibold text-gray-800 group-hover:text-hijau-600 transition-colors truncate">
+          {{ sk.nama }}
+        </h3>
+        <p class="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+          <span class="material-icons-round" style="font-size:12px;">description</span>
+          {{ sk.total_dokumen }} dokumen
+        </p>
+      </div>
+      <span class="material-icons-round text-gray-300 group-hover:text-hijau-500 group-hover:translate-x-1 transition-all" style="font-size:20px;">
+        arrow_forward_ios
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Kosong -->
+  <div class="text-center py-16 bg-white rounded-2xl border border-gray-100">
+    <span class="material-icons-round text-gray-300" style="font-size:64px;">folder_open</span>
+    <p class="text-gray-500 font-medium mt-4">Belum ada sub-kamar di sini.</p>
+    <p class="text-gray-400 text-sm mt-1">Sub-kamar akan ditambahkan oleh admin.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

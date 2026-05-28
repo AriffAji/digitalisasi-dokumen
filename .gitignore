@@ -1,9 +1,22 @@
-venv/
-__pycache__/
+# Environment & secrets
+.env
+
+# Database
 *.db
+*.sqlite
+
+# Python
+__pycache__/
 *.pyc
 *.pyo
-uploads/
-.env
-instance/
+venv/
+env/
+.venv/
 
+# Uploads (file PDF tidak perlu di-commit)
+uploads/*
+!uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
