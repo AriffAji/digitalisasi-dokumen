@@ -1,293 +1,326 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}{{ SISTEM_NAMA }}{% endblock %} — {{ SISTEM_NAMA }} {{ INSTANSI_NAMA }}</title>
-    <link rel="icon" type="image/webp" href="https://res.cloudinary.com/dvul7dq3b/image/upload/v1755843240/logowebp_bqssky.webp" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{{ SISTEM_NAMA }}{% endblock %} — {{ SISTEM_NAMA }} {{ INSTANSI_NAMA }}</title>
+  <link rel="icon" type="image/webp" href="https://res.cloudinary.com/dvul7dq3b/image/upload/v1755843240/logowebp_bqssky.webp" />
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Flowbite -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+  <!-- Flowbite -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
 
-    <!-- Google Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
 
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-    <script>
-      // Tailwind custom config warna PPNP
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              hijau: {
-                DEFAULT: "#205A28",
-                50: "#f0f7f1",
-                100: "#d9ecdb",
-                200: "#b5d9b9",
-                300: "#84be8b",
-                400: "#519d5a",
-                500: "#2f7d39",
-                600: "#205A28",
-                700: "#1a4820",
-                800: "#163a1b",
-                900: "#122f17",
-              },
-              merah: {
-                DEFAULT: "#C72B32",
-                50: "#fef2f2",
-                100: "#fde3e4",
-                200: "#fbcacc",
-                300: "#f7a4a7",
-                400: "#f17075",
-                500: "#e74248",
-                600: "#C72B32",
-                700: "#a82028",
-                800: "#8b1e25",
-                900: "#741e23",
-              },
+  <script>
+    // Tailwind custom config warna PPNP
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            hijau: {
+              DEFAULT: '#205A28',
+              50:  '#f0f7f1',
+              100: '#d9ecdb',
+              200: '#b5d9b9',
+              300: '#84be8b',
+              400: '#519d5a',
+              500: '#2f7d39',
+              600: '#205A28',
+              700: '#1a4820',
+              800: '#163a1b',
+              900: '#122f17',
             },
-            fontFamily: {
-              sans: ["Plus Jakarta Sans", "sans-serif"],
+            merah: {
+              DEFAULT: '#C72B32',
+              50:  '#fef2f2',
+              100: '#fde3e4',
+              200: '#fbcacc',
+              300: '#f7a4a7',
+              400: '#f17075',
+              500: '#e74248',
+              600: '#C72B32',
+              700: '#a82028',
+              800: '#8b1e25',
+              900: '#741e23',
             },
           },
-        },
-      };
-    </script>
-
-    <style>
-      body {
-        font-family: "Plus Jakarta Sans", sans-serif;
-      }
-
-      /* Scrollbar custom */
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f5f9;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #205a28;
-        border-radius: 3px;
-      }
-
-      /* Flash message animation */
-      .flash-message {
-        animation: slideDown 0.3s ease-out;
-      }
-      @keyframes slideDown {
-        from {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
         }
       }
+    }
+  </script>
 
-      /* Material Icons align */
-      .material-icons-round {
-        vertical-align: middle;
-        font-size: 20px;
-      }
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-      /* Active nav link */
-      .nav-active {
-        background-color: rgba(255, 255, 255, 0.15);
-        border-left: 3px solid #ffffff;
-      }
-    </style>
+    /* Scrollbar custom */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #205A28; border-radius: 3px; }
 
-    {% block extra_css %}{% endblock %}
-  </head>
+    /* Flash message animation */
+    .flash-message { animation: slideDown 0.3s ease-out; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-  <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
-    <!-- ===== NAVBAR ===== -->
-    <nav class="bg-hijau-600 shadow-lg sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-          <!-- Logo & Nama Sistem -->
-          <a href="{{ url_for('public.index') }}" class="flex items-center gap-3 group">
-            <img src="https://res.cloudinary.com/dvul7dq3b/image/upload/v1755843240/logowebp_bqssky.webp" alt="Logo PPNP" class="h-10 w-10 object-contain drop-shadow" />
-            <div class="leading-tight">
-              <div class="text-white font-bold text-lg tracking-wide">{{ SISTEM_NAMA }}</div>
-              <div class="text-green-200 text-xs font-medium hidden sm:block">{{ INSTANSI_NAMA }}</div>
-            </div>
-          </a>
+    /* Material Icons align */
+    .material-icons-round {
+      vertical-align: middle;
+      font-size: 20px;
+    }
 
-          <!-- Nav Links (Desktop) -->
-          <div class="hidden md:flex items-center gap-1">
-            <a href="{{ url_for('public.index') }}" class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
-              <span class="material-icons-round" style="font-size: 18px">home</span> Beranda
-            </a>
-            <a href="#kamar" class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
-              <span class="material-icons-round" style="font-size: 18px">folder_open</span> Kamar Arsip
-            </a>
-            <a href="#" class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
-              <span class="material-icons-round" style="font-size: 18px">search</span> Cari Dokumen
-            </a>
+    /* Active nav link */
+    .nav-active {
+      background-color: rgba(255,255,255,0.15);
+      border-left: 3px solid #ffffff;
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="bg-hijau-600 shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo & Nama Sistem -->
+        <a href="{{ url_for('public.index') }}" class="flex items-center gap-3 group">
+          <img src="https://res.cloudinary.com/dvul7dq3b/image/upload/v1755843240/logowebp_bqssky.webp"
+               alt="Logo PPNP"
+               class="h-10 w-10 object-contain drop-shadow" />
+          <div class="leading-tight">
+            <div class="text-white font-bold text-lg tracking-wide">{{ SISTEM_NAMA }}</div>
+            <div class="text-green-200 text-xs font-medium hidden sm:block">{{ INSTANSI_NAMA }}</div>
           </div>
+        </a>
 
-          <!-- Auth Buttons -->
-          <div class="flex items-center gap-2">
-            {% if current_user.is_authenticated %}
+        <!-- Nav Links (Desktop) -->
+        <div class="hidden md:flex items-center gap-1">
+          <a href="{{ url_for('public.index') }}"
+             class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
+            <span class="material-icons-round" style="font-size:18px;">home</span> Beranda
+          </a>
+          <a href="#kamar"
+             class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
+            <span class="material-icons-round" style="font-size:18px;">folder_open</span> Kamar Arsip
+          </a>
+          <a href="#"
+             class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
+            <span class="material-icons-round" style="font-size:18px;">search</span> Cari Dokumen
+          </a>
+        </div>
+
+        <!-- Auth Buttons -->
+        <div class="flex items-center gap-2">
+          {% if current_user.is_authenticated %}
             <!-- User sudah login -->
             <div class="flex items-center gap-2">
-              <div class="hidden sm:flex items-center gap-2 bg-white/10 rounded-lg px-3 py-1.5">
-                <span class="material-icons-round text-green-200" style="font-size: 18px">account_circle</span>
+              <a href="{{ url_for('auth.profil') }}"
+                 class="hidden sm:flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-1.5 transition-all">
+                <span class="material-icons-round text-green-200" style="font-size:18px;">account_circle</span>
                 <span class="text-white text-sm font-medium">{{ current_user.nama }}</span>
-                <span class="bg-green-200 text-hijau-700 text-xs font-bold px-2 py-0.5 rounded-full capitalize"> {{ current_user.role }} </span>
-              </div>
+                <span class="bg-green-200 text-hijau-700 text-xs font-bold px-2 py-0.5 rounded-full capitalize">
+                  {{ current_user.role }}
+                </span>
+              </a>
 
               {% if current_user.is_superadmin() %}
-              <a href="{{ url_for('superadmin.dashboard') }}" class="bg-white text-hijau-600 hover:bg-green-50 px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 transition-all">
-                <span class="material-icons-round" style="font-size: 16px">dashboard</span>
-                <span class="hidden sm:inline">Dashboard</span>
-              </a>
+                <a href="{{ url_for('superadmin.dashboard') }}"
+                   class="bg-white text-hijau-600 hover:bg-green-50 px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 transition-all">
+                  <span class="material-icons-round" style="font-size:16px;">dashboard</span>
+                  <span class="hidden sm:inline">Dashboard</span>
+                </a>
               {% elif current_user.is_admin() %}
-              <a href="{{ url_for('admin.dashboard') }}" class="bg-white text-hijau-600 hover:bg-green-50 px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 transition-all">
-                <span class="material-icons-round" style="font-size: 16px">dashboard</span>
-                <span class="hidden sm:inline">Dashboard</span>
-              </a>
+                <a href="{{ url_for('admin.dashboard') }}"
+                   class="bg-white text-hijau-600 hover:bg-green-50 px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 transition-all">
+                  <span class="material-icons-round" style="font-size:16px;">dashboard</span>
+                  <span class="hidden sm:inline">Dashboard</span>
+                </a>
               {% endif %}
 
-              <a href="{{ url_for('auth.logout') }}" class="bg-merah-600 hover:bg-merah-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 transition-all">
-                <span class="material-icons-round" style="font-size: 16px">logout</span>
+              <a href="{{ url_for('auth.logout') }}"
+                 class="bg-merah-600 hover:bg-merah-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1 transition-all">
+                <span class="material-icons-round" style="font-size:16px;">logout</span>
                 <span class="hidden sm:inline">Keluar</span>
               </a>
             </div>
-            {% else %}
+          {% else %}
             <!-- Belum login -->
-            <a href="{{ url_for('auth.login') }}" class="bg-white text-hijau-600 hover:bg-green-50 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-all shadow-sm">
-              <span class="material-icons-round" style="font-size: 18px">login</span>
+            <a href="{{ url_for('auth.login') }}"
+               class="bg-white text-hijau-600 hover:bg-green-50 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+              <span class="material-icons-round" style="font-size:18px;">login</span>
               Masuk
             </a>
-            {% endif %}
+          {% endif %}
 
-            <!-- Mobile menu button -->
-            <button data-collapse-toggle="mobile-menu" type="button" class="md:hidden text-green-100 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all">
-              <span class="material-icons-round">menu</span>
+          <!-- Mobile menu button -->
+          <button data-collapse-toggle="mobile-menu" type="button"
+                  class="md:hidden text-green-100 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all">
+            <span class="material-icons-round">menu</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-green-700">
+      <div class="px-4 py-3 space-y-1">
+        <a href="{{ url_for('public.index') }}"
+           class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
+          <span class="material-icons-round" style="font-size:18px;">home</span> Beranda
+        </a>
+        <a href="#kamar"
+           class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
+          <span class="material-icons-round" style="font-size:18px;">folder_open</span> Kamar Arsip
+        </a>
+        <a href="#"
+           class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
+          <span class="material-icons-round" style="font-size:18px;">search</span> Cari Dokumen
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== BREADCRUMB ===== -->
+  {% block breadcrumb %}{% endblock %}
+
+  <!-- ===== FLASH MESSAGES ===== -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-2">
+        {% for category, message in messages %}
+          <div class="flash-message flex items-center gap-3 p-4 rounded-lg border
+            {% if category == 'success' %} bg-green-50 border-green-200 text-green-800
+            {% elif category == 'danger' or category == 'error' %} bg-red-50 border-red-200 text-red-800
+            {% elif category == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-800
+            {% else %} bg-blue-50 border-blue-200 text-blue-800 {% endif %}">
+            <span class="material-icons-round" style="font-size:20px;">
+              {% if category == 'success' %}check_circle
+              {% elif category == 'danger' or category == 'error' %}error
+              {% elif category == 'warning' %}warning
+              {% else %}info{% endif %}
+            </span>
+            <span class="text-sm font-medium flex-1">{{ message }}</span>
+            <button onclick="this.parentElement.remove()" class="opacity-60 hover:opacity-100 transition-opacity">
+              <span class="material-icons-round" style="font-size:18px;">close</span>
             </button>
           </div>
-        </div>
+        {% endfor %}
       </div>
+    {% endif %}
+  {% endwith %}
 
-      <!-- Mobile Menu -->
-      <div id="mobile-menu" class="hidden md:hidden border-t border-green-700">
-        <div class="px-4 py-3 space-y-1">
-          <a href="{{ url_for('public.index') }}" class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
-            <span class="material-icons-round" style="font-size: 18px">home</span> Beranda
-          </a>
-          <a href="#kamar" class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
-            <span class="material-icons-round" style="font-size: 18px">folder_open</span> Kamar Arsip
-          </a>
-          <a href="#" class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
-            <span class="material-icons-round" style="font-size: 18px">search</span> Cari Dokumen
-          </a>
-        </div>
-      </div>
-    </nav>
+  <!-- ===== KONTEN UTAMA ===== -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
 
-    <!-- ===== BREADCRUMB ===== -->
-    {% block breadcrumb %}{% endblock %}
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-merah-600 text-white mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-    <!-- ===== FLASH MESSAGES ===== -->
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-2">
-      {% for category, message in messages %}
-      <div
-        class="flash-message flex items-center gap-3 p-4 rounded-lg border {% if category == 'success' %} bg-green-50 border-green-200 text-green-800 {% elif category == 'danger' or category == 'error' %} bg-red-50 border-red-200 text-red-800 {% elif category == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-800 {% else %} bg-blue-50 border-blue-200 text-blue-800 {% endif %}"
-      >
-        <span class="material-icons-round" style="font-size: 20px">
-          {% if category == 'success' %}check_circle {% elif category == 'danger' or category == 'error' %}error {% elif category == 'warning' %}warning {% else %}info{% endif %}
-        </span>
-        <span class="text-sm font-medium flex-1">{{ message }}</span>
-        <button onclick="this.parentElement.remove()" class="opacity-60 hover:opacity-100 transition-opacity">
-          <span class="material-icons-round" style="font-size: 18px">close</span>
-        </button>
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %} {% endwith %}
-
-    <!-- ===== KONTEN UTAMA ===== -->
-    <main class="flex-1">{% block content %}{% endblock %}</main>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="bg-merah-600 text-white mt-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Kolom 1: Info Sistem -->
-          <div>
-            <div class="flex items-center gap-2 mb-3">
-              <span class="material-icons-round text-red-200">folder_special</span>
-              <span class="font-bold text-lg">{{ SISTEM_NAMA }}</span>
-            </div>
-            <p class="text-red-100 text-sm leading-relaxed">{{ SISTEM_LENGKAP }} — platform digital terpusat untuk pengelolaan arsip dokumen kepegawaian {{ INSTANSI_LENGKAP }}.</p>
+        <!-- Kolom 1: Info Sistem -->
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-icons-round text-red-200">folder_special</span>
+            <span class="font-bold text-lg">{{ SISTEM_NAMA }}</span>
           </div>
-
-          <!-- Kolom 2: Link Cepat -->
-          <div>
-            <h3 class="font-semibold mb-3 text-red-100 uppercase text-xs tracking-wider">Navigasi</h3>
-            <ul class="space-y-2 text-sm">
-              <li>
-                <a href="{{ url_for('public.index') }}" class="text-red-100 hover:text-white flex items-center gap-1.5 transition-colors">
-                  <span class="material-icons-round" style="font-size: 16px">chevron_right</span> Beranda
-                </a>
-              </li>
-              <li>
-                <a href="#kamar" class="text-red-100 hover:text-white flex items-center gap-1.5 transition-colors">
-                  <span class="material-icons-round" style="font-size: 16px">chevron_right</span> Kamar Arsip
-                </a>
-              </li>
-              <li>
-                <a href="{{ url_for('auth.login') }}" class="text-red-100 hover:text-white flex items-center gap-1.5 transition-colors">
-                  <span class="material-icons-round" style="font-size: 16px">chevron_right</span> Login
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Kolom 3: Kontak -->
-          <div>
-            <h3 class="font-semibold mb-3 text-red-100 uppercase text-xs tracking-wider">Instansi</h3>
-            <ul class="space-y-2 text-sm text-red-100">
-              <li class="flex items-start gap-1.5">
-                <span class="material-icons-round mt-0.5" style="font-size: 16px">business</span>
-                {{ INSTANSI_LENGKAP }}
-              </li>
-              <li class="flex items-start gap-1.5">
-                <span class="material-icons-round mt-0.5" style="font-size: 16px">location_on</span>
-                Payakumbuh, Sumatera Barat
-              </li>
-              <li class="flex items-start gap-1.5">
-                <span class="material-icons-round mt-0.5" style="font-size: 16px">language</span>
-                ppnp.ac.id
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Bottom bar -->
-        <div class="border-t border-red-500 mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p class="text-red-200 text-xs">&copy; {{ TAHUN_FOKUS }} {{ SISTEM_NAMA }} — {{ INSTANSI_NAMA }}. Hak cipta dilindungi.</p>
-          <p class="text-red-300 text-xs flex items-center gap-1">
-            <span class="material-icons-round" style="font-size: 14px">code</span>
-            Dikembangkan oleh Tim Kepegawaian {{ INSTANSI_NAMA }}
+          <p class="text-red-100 text-sm leading-relaxed">
+            {{ SISTEM_LENGKAP }} — platform digital terpusat untuk pengelolaan arsip dokumen kepegawaian {{ INSTANSI_LENGKAP }}.
           </p>
         </div>
+
+        <!-- Kolom 2: Link Cepat -->
+        <div>
+          <h3 class="font-semibold mb-3 text-red-100 uppercase text-xs tracking-wider">Navigasi</h3>
+          <ul class="space-y-2 text-sm">
+            <li>
+              <a href="{{ url_for('public.index') }}" class="text-red-100 hover:text-white flex items-center gap-1.5 transition-colors">
+                <span class="material-icons-round" style="font-size:16px;">chevron_right</span> Beranda
+              </a>
+            </li>
+            <li>
+              <a href="#kamar" class="text-red-100 hover:text-white flex items-center gap-1.5 transition-colors">
+                <span class="material-icons-round" style="font-size:16px;">chevron_right</span> Kamar Arsip
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('auth.login') }}" class="text-red-100 hover:text-white flex items-center gap-1.5 transition-colors">
+                <span class="material-icons-round" style="font-size:16px;">chevron_right</span> Login
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Kolom 3: Kontak -->
+        <div>
+          <h3 class="font-semibold mb-3 text-red-100 uppercase text-xs tracking-wider">Instansi</h3>
+          <ul class="space-y-2 text-sm text-red-100">
+            <li class="flex items-start gap-1.5">
+              <span class="material-icons-round mt-0.5" style="font-size:16px;">business</span>
+              {{ INSTANSI_LENGKAP }}
+            </li>
+            <li class="flex items-start gap-1.5">
+              <span class="material-icons-round mt-0.5" style="font-size:16px;">location_on</span>
+              Payakumbuh, Sumatera Barat
+            </li>
+            <li class="flex items-start gap-1.5">
+              <span class="material-icons-round mt-0.5" style="font-size:16px;">language</span>
+              ppnp.ac.id
+            </li>
+          </ul>
+        </div>
+
       </div>
-    </footer>
 
-    <!-- Flowbite JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+      <!-- Bottom bar -->
+      <div class="border-t border-red-500 mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p class="text-red-200 text-xs">
+          &copy; {{ TAHUN_FOKUS }} {{ SISTEM_NAMA }} — {{ INSTANSI_NAMA }}. Hak cipta dilindungi.
+        </p>
+        <p class="text-red-300 text-xs flex items-center gap-1">
+          <span class="material-icons-round" style="font-size:14px;">code</span>
+          Dikembangkan oleh Tim Kepegawaian {{ INSTANSI_NAMA }}
+        </p>
+      </div>
+    </div>
+  </footer>
 
-    {% block extra_js %}{% endblock %}
-  </body>
+  <!-- Flowbite JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+  <!-- Flash Message Auto-Hide -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const flashes = document.querySelectorAll('.flash-message');
+      flashes.forEach(el => {
+        // Auto-hide setelah 4 detik
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(-8px)';
+          setTimeout(() => el.remove(), 500);
+        }, 4000);
+      });
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
 </html>

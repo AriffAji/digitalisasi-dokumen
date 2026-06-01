@@ -145,6 +145,7 @@
         </button>
       </div>
       <form method="POST" action="{{ url_for('admin.dokumen_upload') }}" enctype="multipart/form-data" class="p-5 space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2">
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Sub-Kamar <span class="text-merah-600">*</span></label>
@@ -198,6 +199,10 @@
           </div>
           <div class="col-span-2">
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">File PDF <span class="text-merah-600">*</span></label>
+
+            <!-- Alert di dalam modal -->
+            <div id="uploadAlert" class="hidden mb-3 flex items-center gap-3 p-3 rounded-xl border text-sm font-medium"></div>
+
             <div id="dropZone"
                  class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-hijau-300 transition-colors cursor-pointer"
                  onclick="document.getElementById('fileInput').click()"
@@ -243,6 +248,7 @@
         </button>
       </div>
       <form method="POST" action="{{ url_for('admin.dokumen_edit', dok_id=dok.id) }}" enctype="multipart/form-data" class="p-5 space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nomor Dokumen</label>
@@ -300,6 +306,7 @@
         </p>
         <div class="flex gap-3">
           <form method="POST" action="{{ url_for('admin.dokumen_hapus', dok_id=dok.id) }}" class="flex-1">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="w-full bg-merah-600 hover:bg-merah-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-all">
               Ya, Hapus
             </button>
@@ -319,15 +326,40 @@
 
 {% block extra_js %}
 <script>
+  // ===== Inline Alert di dalam Modal =====
+  function showAlert(message, type = 'error') {
+    const alert = document.getElementById('uploadAlert');
+    const styles = {
+      error:   { bg: 'bg-red-50',    border: 'border-red-200',    text: 'text-red-800',    icon: 'error',        iconColor: 'text-merah-600' },
+      success: { bg: 'bg-green-50',  border: 'border-green-200',  text: 'text-green-800',  icon: 'check_circle', iconColor: 'text-hijau-600' },
+      warning: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-800', icon: 'warning',      iconColor: 'text-yellow-500' },
+    };
+    const s = styles[type] || styles.error;
+
+    alert.className = `mb-3 flex items-center gap-3 p-3 rounded-xl border text-sm font-medium ${s.bg} ${s.border} ${s.text}`;
+    alert.innerHTML = `
+      <span class="material-icons-round ${s.iconColor}" style="font-size:18px">${s.icon}</span>
+      <span class="flex-1">${message}</span>
+      <button type="button" onclick="document.getElementById('uploadAlert').classList.add('hidden')" class="opacity-50 hover:opacity-100">
+        <span class="material-icons-round" style="font-size:16px">close</span>
+      </button>
+    `;
+    alert.classList.remove('hidden');
+
+    // Auto-hide setelah 4 detik
+    setTimeout(() => alert.classList.add('hidden'), 4000);
+  }
+
+  // ===== Drag & Drop Upload =====
   function updateFileName(file) {
     if (!file) return;
-    if (!file.name.endsWith('.pdf')) {
-      alert('Hanya file PDF yang diizinkan!');
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      showAlert('Hanya file PDF yang diizinkan!', 'error');
       document.getElementById('fileInput').value = '';
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      alert('Ukuran file maksimal 10MB!');
+      showAlert('Ukuran file maksimal 10MB!', 'warning');
       document.getElementById('fileInput').value = '';
       return;
     }
@@ -338,6 +370,7 @@
     document.getElementById('dropIcon').style.color = '#205A28';
     document.getElementById('dropZone').classList.add('border-hijau-400', 'bg-hijau-50');
     document.getElementById('dropZone').classList.remove('border-gray-200');
+    showAlert(`File siap diupload! (${size} MB)`, 'success');
   }
 
   function handleDragOver(e) {

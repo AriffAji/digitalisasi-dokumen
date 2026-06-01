@@ -1,4 +1,15 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, current_app
+import re
+
+def validate_password(password):
+    if len(password) < 8:
+        return False, "Password minimal 8 karakter"
+    if not re.search(r'[A-Za-z]', password):
+        return False, "Password harus mengandung huruf"
+    if not re.search(r'[0-9]', password):
+        return False, "Password harus mengandung angka"
+    return True, ""
+
 from flask_login import current_user
 from blueprints.superadmin import superadmin_bp
 from decorators import superadmin_required
@@ -37,6 +48,56 @@ def dashboard():
         dokumen_terbaru  = dokumen_terbaru,
         admin_list       = admin_list,
     )
+
+# ===== LOG VIEWER =====
+@superadmin_bp.route('/log')
+@superadmin_required
+def log_viewer():
+    import os, re
+    log_path = os.path.join(
+        os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')),
+        'logs', 'siadik.log'
+    )
+    filter_type = request.args.get('filter', '').upper()
+    logs  = []
+    stats = {'login': 0, 'gagal': 0, 'upload': 0, 'hapus': 0}
+
+    if os.path.exists(log_path):
+        with open(log_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        # Parse setiap baris log
+        pattern = re.compile(r'\[(.+?)\] (\w+) - (.+)')
+        for line in reversed(lines):
+            line = line.strip()
+            if not line:
+                continue
+            match = pattern.match(line)
+            if not match:
+                continue
+            waktu, level, pesan = match.groups()
+
+            # Hitung statistik
+            if 'LOGIN:' in pesan:        stats['login'] += 1
+            if 'LOGIN GAGAL' in pesan:   stats['gagal'] += 1
+            if 'UPLOAD:' in pesan:       stats['upload'] += 1
+            if 'HAPUS DOKUMEN' in pesan: stats['hapus'] += 1
+
+            # Apply filter
+            if filter_type and filter_type not in pesan:
+                continue
+
+            logs.append({'waktu': waktu, 'level': level, 'pesan': pesan})
+
+        # Batasi 200 baris terakhir
+        logs = logs[:200]
+
+    return render_template('superadmin/log_viewer.html',
+        logs        = logs,
+        stats       = stats,
+        filter      = filter_type,
+    )
+
 
 # ===== KAMAR =====
 @superadmin_bp.route('/kamar')
@@ -111,6 +172,11 @@ def admin_tambah():
         flash('Semua field wajib diisi.', 'danger')
         return redirect(url_for('superadmin.admin_list'))
 
+    valid, pesan = validate_password(password)
+    if not valid:
+        flash(pesan, 'danger')
+        return redirect(url_for('superadmin.admin_list'))
+
     if User.query.filter_by(email=email).first():
         flash(f'Email "{email}" sudah terdaftar.', 'danger')
         return redirect(url_for('superadmin.admin_list'))
@@ -124,6 +190,9 @@ def admin_tambah():
     u.set_password(password)
     db.session.add(u)
     db.session.commit()
+    current_app.logger.info(
+        f'TAMBAH ADMIN: {current_user.email} | admin_baru="{nama}" | kamar="{kamar.nama}"'
+    )
     flash(f'Admin "{nama}" untuk kamar "{kamar.nama}" berhasil ditambahkan.', 'success')
     return redirect(url_for('superadmin.admin_list'))
 
@@ -135,8 +204,12 @@ def admin_hapus(admin_id):
         flash('Bukan akun admin.', 'danger')
         return redirect(url_for('superadmin.admin_list'))
     nama = u.nama
+    email_admin = u.email
     db.session.delete(u)
     db.session.commit()
+    current_app.logger.warning(
+        f'HAPUS ADMIN: {current_user.email} | admin="{nama}" ({email_admin})'
+    )
     flash(f'Admin "{nama}" berhasil dihapus.', 'success')
     return redirect(url_for('superadmin.admin_list'))
 
@@ -158,7 +231,16 @@ def admin_reset_password(admin_id):
     if not password_baru:
         flash('Password baru tidak boleh kosong.', 'danger')
         return redirect(url_for('superadmin.admin_list'))
+
+    valid, pesan = validate_password(password_baru)
+    if not valid:
+        flash(pesan, 'danger')
+        return redirect(url_for('superadmin.admin_list'))
+
     u.set_password(password_baru)
     db.session.commit()
+    current_app.logger.warning(
+        f'RESET PASSWORD: {current_user.email} | target="{u.nama}" ({u.email})'
+    )
     flash(f'Password admin "{u.nama}" berhasil direset.', 'success')
     return redirect(url_for('superadmin.admin_list'))

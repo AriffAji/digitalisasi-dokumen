@@ -93,6 +93,18 @@
           <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
         </a>
 
+        <a href="{{ url_for('superadmin.log_viewer') }}"
+           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+          <div class="bg-orange-50 group-hover:bg-orange-100 rounded-xl p-2.5 transition-colors">
+            <span class="material-icons-round text-orange-500" style="font-size:22px;">history</span>
+          </div>
+          <div>
+            <div class="font-semibold text-gray-800 text-sm group-hover:text-orange-600 transition-colors">Log Aktivitas</div>
+            <div class="text-gray-400 text-xs">Pantau aktivitas sistem</div>
+          </div>
+          <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
+        </a>
+
         <a href="{{ url_for('public.index') }}" target="_blank"
            class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all group">
           <div class="bg-gray-50 group-hover:bg-gray-100 rounded-xl p-2.5 transition-colors">

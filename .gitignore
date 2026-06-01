@@ -1,6 +1,10 @@
 # Environment & secrets
 .env
 
+# Log files
+logs/
+*.log
+
 # Database
 *.db
 *.sqlite

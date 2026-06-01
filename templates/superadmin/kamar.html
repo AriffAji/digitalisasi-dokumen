@@ -98,6 +98,7 @@
         </button>
       </div>
       <form method="POST" action="{{ url_for('superadmin.kamar_tambah') }}" class="p-5 space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Kamar <span class="text-merah-600">*</span></label>
           <input type="text" name="nama" required placeholder="contoh: Keuangan"
@@ -147,6 +148,7 @@
         </button>
       </div>
       <form method="POST" action="{{ url_for('superadmin.kamar_edit', kamar_id=k.id) }}" class="p-5 space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Kamar <span class="text-merah-600">*</span></label>
           <input type="text" name="nama" value="{{ k.nama }}" required
@@ -197,6 +199,7 @@
       </p>
       <div class="flex gap-3">
         <form method="POST" action="{{ url_for('superadmin.kamar_hapus', kamar_id=k.id) }}" class="flex-1">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="w-full bg-merah-600 hover:bg-merah-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-all">Ya, Hapus</button>
         </form>
         <button type="button" data-modal-hide="modalHapus{{ k.id }}"

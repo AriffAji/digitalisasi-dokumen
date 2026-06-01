@@ -6,13 +6,34 @@ from decorators import admin_required
 from models import db, User, Kamar, SubKamar, Dokumen
 from werkzeug.utils import secure_filename
 
+def validate_password(password):
+    import re
+    if len(password) < 8:
+        return False, "Password minimal 8 karakter"
+    if not re.search(r'[A-Za-z]', password):
+        return False, "Password harus mengandung huruf"
+    if not re.search(r'[0-9]', password):
+        return False, "Password harus mengandung angka"
+    return True, ""
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'pdf'}
+
+def is_valid_pdf(file_obj):
+    # Cek magic bytes - PDF asli selalu mulai dengan %PDF
+    # Mencegah file berbahaya yang di-rename jadi .pdf
+    header = file_obj.read(4)
+    file_obj.seek(0)
+    return header == b'%PDF'
 
 # ===== DASHBOARD =====
 @admin_bp.route('/dashboard')
 @admin_required
 def dashboard():
+    # Superadmin redirect ke dashboard superadmin
+    if current_user.is_superadmin():
+        return redirect(url_for('superadmin.dashboard'))
+
     kamar = Kamar.query.get(current_user.kamar_id)
     if not kamar:
         flash('Kamar Anda belum dikonfigurasi. Hubungi superadmin.', 'warning')
@@ -148,6 +169,10 @@ def dokumen_upload():
         flash('Hanya file PDF yang diizinkan.', 'danger')
         return redirect(url_for('admin.dokumen'))
 
+    if not is_valid_pdf(file):
+        flash('File tidak valid. Pastikan file adalah PDF asli.', 'danger')
+        return redirect(url_for('admin.dokumen'))
+
     # Simpan file
     filename    = secure_filename(file.filename)
     import time
@@ -165,6 +190,9 @@ def dokumen_upload():
     )
     db.session.add(dok)
     db.session.commit()
+    current_app.logger.info(
+        f'UPLOAD: {current_user.email} | dokumen="{judul}" | sub_kamar={sk.nama}'
+    )
     flash(f'Dokumen "{judul}" berhasil diupload.', 'success')
     return redirect(url_for('admin.dokumen', sub_kamar_id=sub_kamar_id))
 
@@ -184,7 +212,7 @@ def dokumen_edit(dok_id):
 
     # Ganti file jika ada upload baru
     file = request.files.get('file')
-    if file and file.filename and allowed_file(file.filename):
+    if file and file.filename and allowed_file(file.filename) and is_valid_pdf(file):
         # Hapus file lama
         old_path = os.path.join(current_app.config['UPLOAD_FOLDER'], dok.file_path)
         if os.path.exists(old_path):
@@ -215,6 +243,9 @@ def dokumen_hapus(dok_id):
     judul = dok.judul
     db.session.delete(dok)
     db.session.commit()
+    current_app.logger.warning(
+        f'HAPUS DOKUMEN: {current_user.email} | dokumen="{judul}"'
+    )
     flash(f'Dokumen "{judul}" berhasil dihapus.', 'success')
     return redirect(url_for('admin.dokumen'))
 
@@ -236,6 +267,11 @@ def user_tambah():
         flash('Semua field wajib diisi.', 'danger')
         return redirect(url_for('admin.user'))
 
+    valid, pesan = validate_password(password)
+    if not valid:
+        flash(pesan, 'danger')
+        return redirect(url_for('admin.user'))
+
     if User.query.filter_by(email=email).first():
         flash(f'Email "{email}" sudah terdaftar.', 'danger')
         return redirect(url_for('admin.user'))
@@ -244,6 +280,9 @@ def user_tambah():
     u.set_password(password)
     db.session.add(u)
     db.session.commit()
+    current_app.logger.info(
+        f'TAMBAH USER: {current_user.email} | user_baru="{nama}" ({email})'
+    )
     flash(f'User "{nama}" berhasil ditambahkan.', 'success')
     return redirect(url_for('admin.user'))
 
@@ -257,6 +296,9 @@ def user_hapus(user_id):
     nama = u.nama
     db.session.delete(u)
     db.session.commit()
+    current_app.logger.warning(
+        f'HAPUS USER: {current_user.email} | user="{nama}" ({u.email if hasattr(u, "email") else ""})'
+    )
     flash(f'User "{nama}" berhasil dihapus.', 'success')
     return redirect(url_for('admin.user'))
 

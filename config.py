@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Load .env otomatis
 load_dotenv()
@@ -20,6 +21,16 @@ class Config:
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10MB
     ALLOWED_EXTENSIONS = {'pdf'}
 
+    # ===== SESSION SECURITY =====
+    # Session otomatis expire setelah 8 jam tidak aktif
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
+    # Cegah JavaScript akses cookie (proteksi XSS)
+    SESSION_COOKIE_HTTPONLY = True
+    # Proteksi CSRF tambahan via SameSite
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    # Set True jika sudah pakai HTTPS (aktifkan saat deploy Agustus)
+    SESSION_COOKIE_SECURE = False
+
     # Info instansi
     INSTANSI_NAMA     = 'PPNP'
     INSTANSI_LENGKAP  = 'Politeknik Pertanian Negeri Payakumbuh'
@@ -32,6 +43,8 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    # Aktifkan saat deploy dengan HTTPS (Agustus)
+    SESSION_COOKIE_SECURE = True
     # Uncomment ini nanti saat migrasi ke MariaDB (Agustus):
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://siadik_user:SiadikPPNP@2026@localhost/siadik'
 

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Terlalu Banyak Percobaan{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center px-4">
+  <div class="text-center">
+    <div class="text-8xl font-black text-merah-600 mb-4">429</div>
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">Terlalu Banyak Percobaan</h1>
+    <p class="text-gray-500 mb-2">Anda telah melakukan terlalu banyak percobaan login.</p>
+    <p class="text-gray-400 text-sm mb-8">Silakan tunggu <strong>1 menit</strong> sebelum mencoba lagi.</p>
+    <a href="{{ url_for('auth.login') }}"
+       class="bg-hijau-600 hover:bg-hijau-700 text-white px-6 py-3 rounded-xl font-semibold inline-flex items-center gap-2 transition-all">
+      <span class="material-icons-round">login</span>
+      Kembali ke Login
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Log Aktivitas{% endblock %}
+
+{% block breadcrumb %}
+<div class="bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <nav class="flex items-center gap-2 text-sm text-gray-500">
+      <a href="{{ url_for('superadmin.dashboard') }}" class="hover:text-hijau-600 flex items-center gap-1 transition-colors">
+        <span class="material-icons-round" style="font-size:16px;">dashboard</span> Dashboard
+      </a>
+      <span class="material-icons-round text-gray-300" style="font-size:16px;">chevron_right</span>
+      <span class="text-hijau-600 font-semibold">Log Aktivitas</span>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-extrabold text-gray-800 flex items-center gap-2">
+        <span class="material-icons-round text-hijau-600">history</span>
+        Log Aktivitas Sistem
+      </h1>
+      <p class="text-gray-500 text-sm mt-1">{{ logs|length }} entri ditampilkan</p>
+    </div>
+    <a href="{{ url_for('superadmin.log_viewer') }}"
+       class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all">
+      <span class="material-icons-round" style="font-size:18px;">refresh</span>
+      Refresh
+    </a>
+  </div>
+
+  <!-- Statistik Log -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-3">
+      <div class="bg-green-50 rounded-xl p-2.5">
+        <span class="material-icons-round text-green-600" style="font-size:22px;">login</span>
+      </div>
+      <div>
+        <div class="text-2xl font-black text-gray-800">{{ stats.login }}</div>
+        <div class="text-xs text-gray-500 font-medium">Login Berhasil</div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-3">
+      <div class="bg-red-50 rounded-xl p-2.5">
+        <span class="material-icons-round text-merah-600" style="font-size:22px;">warning</span>
+      </div>
+      <div>
+        <div class="text-2xl font-black text-gray-800">{{ stats.gagal }}</div>
+        <div class="text-xs text-gray-500 font-medium">Login Gagal</div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-3">
+      <div class="bg-blue-50 rounded-xl p-2.5">
+        <span class="material-icons-round text-blue-600" style="font-size:22px;">upload_file</span>
+      </div>
+      <div>
+        <div class="text-2xl font-black text-gray-800">{{ stats.upload }}</div>
+        <div class="text-xs text-gray-500 font-medium">Upload Dokumen</div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-3">
+      <div class="bg-orange-50 rounded-xl p-2.5">
+        <span class="material-icons-round text-orange-600" style="font-size:22px;">delete</span>
+      </div>
+      <div>
+        <div class="text-2xl font-black text-gray-800">{{ stats.hapus }}</div>
+        <div class="text-xs text-gray-500 font-medium">Hapus Dokumen</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+    <div class="flex flex-wrap gap-2">
+      <a href="{{ url_for('superadmin.log_viewer') }}"
+         class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5
+                {{ 'bg-hijau-600 text-white' if not filter else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <span class="material-icons-round" style="font-size:14px;">list</span> Semua
+      </a>
+      <a href="{{ url_for('superadmin.log_viewer', filter='LOGIN') }}"
+         class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5
+                {{ 'bg-green-600 text-white' if filter == 'LOGIN' else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <span class="material-icons-round" style="font-size:14px;">login</span> Login
+      </a>
+      <a href="{{ url_for('superadmin.log_viewer', filter='GAGAL') }}"
+         class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5
+                {{ 'bg-merah-600 text-white' if filter == 'GAGAL' else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <span class="material-icons-round" style="font-size:14px;">warning</span> Login Gagal
+      </a>
+      <a href="{{ url_for('superadmin.log_viewer', filter='UPLOAD') }}"
+         class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5
+                {{ 'bg-blue-600 text-white' if filter == 'UPLOAD' else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <span class="material-icons-round" style="font-size:14px;">upload_file</span> Upload
+      </a>
+      <a href="{{ url_for('superadmin.log_viewer', filter='HAPUS') }}"
+         class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5
+                {{ 'bg-orange-500 text-white' if filter == 'HAPUS' else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <span class="material-icons-round" style="font-size:14px;">delete</span> Hapus
+      </a>
+      <a href="{{ url_for('superadmin.log_viewer', filter='PASSWORD') }}"
+         class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5
+                {{ 'bg-purple-600 text-white' if filter == 'PASSWORD' else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+        <span class="material-icons-round" style="font-size:14px;">lock_reset</span> Password
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabel Log -->
+  {% if logs %}
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-100">
+            <th class="px-5 py-4 text-left text-xs font-bold text-gray-400 uppercase">Waktu</th>
+            <th class="px-5 py-4 text-left text-xs font-bold text-gray-400 uppercase">Level</th>
+            <th class="px-5 py-4 text-left text-xs font-bold text-gray-400 uppercase">Aktivitas</th>
+            <th class="px-5 py-4 text-left text-xs font-bold text-gray-400 uppercase">Detail</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for log in logs %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <!-- Waktu -->
+            <td class="px-5 py-3 text-gray-400 text-xs font-mono whitespace-nowrap">
+              {{ log.waktu }}
+            </td>
+            <!-- Level badge -->
+            <td class="px-5 py-3">
+              {% if log.level == 'INFO' %}
+              <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">INFO</span>
+              {% elif log.level == 'WARNING' %}
+              <span class="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded-full">WARN</span>
+              {% else %}
+              <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-0.5 rounded-full">{{ log.level }}</span>
+              {% endif %}
+            </td>
+            <!-- Tipe aktivitas -->
+            <td class="px-5 py-3">
+              {% if 'LOGIN GAGAL' in log.pesan %}
+                <span class="flex items-center gap-1.5 text-merah-600 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">warning</span> Login Gagal
+                </span>
+              {% elif 'LOGIN:' in log.pesan %}
+                <span class="flex items-center gap-1.5 text-green-600 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">login</span> Login
+                </span>
+              {% elif 'LOGOUT' in log.pesan %}
+                <span class="flex items-center gap-1.5 text-gray-500 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">logout</span> Logout
+                </span>
+              {% elif 'UPLOAD' in log.pesan %}
+                <span class="flex items-center gap-1.5 text-blue-600 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">upload_file</span> Upload
+                </span>
+              {% elif 'HAPUS DOKUMEN' in log.pesan %}
+                <span class="flex items-center gap-1.5 text-orange-600 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">delete</span> Hapus Dokumen
+                </span>
+              {% elif 'RESET PASSWORD' in log.pesan or 'GANTI PASSWORD' in log.pesan %}
+                <span class="flex items-center gap-1.5 text-purple-600 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">lock_reset</span> Password
+                </span>
+              {% elif 'TAMBAH' in log.pesan %}
+                <span class="flex items-center gap-1.5 text-hijau-600 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">person_add</span> Tambah
+                </span>
+              {% elif 'HAPUS' in log.pesan %}
+                <span class="flex items-center gap-1.5 text-merah-600 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">person_remove</span> Hapus
+                </span>
+              {% else %}
+                <span class="flex items-center gap-1.5 text-gray-500 font-semibold text-xs">
+                  <span class="material-icons-round" style="font-size:16px;">info</span> Sistem
+                </span>
+              {% endif %}
+            </td>
+            <!-- Detail pesan -->
+            <td class="px-5 py-3 text-gray-600 text-xs font-mono">{{ log.pesan }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="text-center py-16 bg-white rounded-2xl border border-gray-100">
+    <span class="material-icons-round text-gray-200" style="font-size:64px;">history</span>
+    <p class="text-gray-500 font-medium mt-4">
+      {% if filter %}
+        Tidak ada log dengan filter "{{ filter }}".
+      {% else %}
+        Belum ada log aktivitas.
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
