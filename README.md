@@ -105,9 +105,9 @@ Akun superadmin dibuat otomatis saat pertama jalan:
 
 | Email | Password |
 |---|---|
-| `superadmin@ppnp.ac.id` | `SuperAdmin@2026` |
+| <superadmin@ppnp.ac.id> | *[Hubungi administrator]* |
 
-> ⚠️ **Ganti password setelah login pertama!**
+> > ⚠️ **Password diatur langsung oleh administrator. Tidak dipublikasikan.**
 
 ---
 
