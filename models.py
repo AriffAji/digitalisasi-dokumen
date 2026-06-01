@@ -10,18 +10,16 @@ class User(UserMixin, db.Model):
 
     id            = db.Column(db.Integer, primary_key=True)
     nama          = db.Column(db.String(100), nullable=False)
-    email         = db.Column(db.String(100), unique=True, nullable=False)
+    email         = db.Column(db.String(100), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    role          = db.Column(db.String(20), nullable=False, default='user')
-    # role: superadmin | admin | user
-    kamar_id      = db.Column(db.Integer, db.ForeignKey('kamar.id'), nullable=True)
-    # kamar_id diisi hanya untuk role admin (admin hanya bisa akses kamarnya)
-    is_active     = db.Column(db.Boolean, default=True)
+    role          = db.Column(db.String(20), nullable=False, default='user', index=True)
+    kamar_id      = db.Column(db.Integer, db.ForeignKey('kamar.id'), nullable=True, index=True)
+    is_active     = db.Column(db.Boolean, default=True, index=True)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relasi
-    kamar         = db.relationship('Kamar', backref='admins')
-    dokumen       = db.relationship('Dokumen', backref='uploader', lazy='dynamic')
+    kamar   = db.relationship('Kamar', backref='admins')
+    dokumen = db.relationship('Dokumen', backref='uploader', lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -45,17 +43,16 @@ class User(UserMixin, db.Model):
 class Kamar(db.Model):
     __tablename__ = 'kamar'
 
-    id          = db.Column(db.Integer, primary_key=True)
-    nama        = db.Column(db.String(100), nullable=False)
-    deskripsi   = db.Column(db.Text, nullable=True)
-    status      = db.Column(db.String(20), nullable=False, default='terkunci')
-    # status: aktif | terkunci
-    urutan      = db.Column(db.Integer, default=0)
-    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    id         = db.Column(db.Integer, primary_key=True)
+    nama       = db.Column(db.String(100), nullable=False)
+    deskripsi  = db.Column(db.Text, nullable=True)
+    status     = db.Column(db.String(20), nullable=False, default='terkunci', index=True)
+    urutan     = db.Column(db.Integer, default=0, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relasi
-    sub_kamar   = db.relationship('SubKamar', backref='kamar', lazy='dynamic',
-                                   cascade='all, delete-orphan')
+    sub_kamar = db.relationship('SubKamar', backref='kamar', lazy='dynamic',
+                                 cascade='all, delete-orphan')
 
     @property
     def total_dokumen(self):
@@ -71,15 +68,15 @@ class Kamar(db.Model):
 class SubKamar(db.Model):
     __tablename__ = 'sub_kamar'
 
-    id          = db.Column(db.Integer, primary_key=True)
-    kamar_id    = db.Column(db.Integer, db.ForeignKey('kamar.id'), nullable=False)
-    nama        = db.Column(db.String(100), nullable=False)
-    deskripsi   = db.Column(db.Text, nullable=True)
-    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    id         = db.Column(db.Integer, primary_key=True)
+    kamar_id   = db.Column(db.Integer, db.ForeignKey('kamar.id'), nullable=False, index=True)
+    nama       = db.Column(db.String(100), nullable=False)
+    deskripsi  = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relasi
-    dokumen     = db.relationship('Dokumen', backref='sub_kamar', lazy='dynamic',
-                                   cascade='all, delete-orphan')
+    dokumen = db.relationship('Dokumen', backref='sub_kamar', lazy='dynamic',
+                               cascade='all, delete-orphan')
 
     @property
     def total_dokumen(self):
@@ -92,18 +89,23 @@ class SubKamar(db.Model):
 class Dokumen(db.Model):
     __tablename__ = 'dokumen'
 
-    id              = db.Column(db.Integer, primary_key=True)
-    sub_kamar_id    = db.Column(db.Integer, db.ForeignKey('sub_kamar.id'), nullable=False)
-    nomor_dokumen   = db.Column(db.String(100), nullable=True)
-    judul           = db.Column(db.String(255), nullable=False)
-    file_path       = db.Column(db.String(255), nullable=False)
-    status          = db.Column(db.String(20), nullable=False, default='aktif')
-    # status: aktif | arsip
-    visibilitas     = db.Column(db.String(20), nullable=False, default='internal')
-    # visibilitas: publik | internal
-    uploaded_by     = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at      = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id            = db.Column(db.Integer, primary_key=True)
+    sub_kamar_id  = db.Column(db.Integer, db.ForeignKey('sub_kamar.id'), nullable=False, index=True)
+    nomor_dokumen = db.Column(db.String(100), nullable=True)
+    judul         = db.Column(db.String(255), nullable=False, index=True)
+    file_path     = db.Column(db.String(255), nullable=False)
+    status        = db.Column(db.String(20), nullable=False, default='aktif', index=True)
+    visibilitas   = db.Column(db.String(20), nullable=False, default='internal', index=True)
+    uploaded_by   = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at    = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Composite index untuk query yang sering dipakai bersamaan
+    __table_args__ = (
+        db.Index('idx_dokumen_sub_status',      'sub_kamar_id', 'status'),
+        db.Index('idx_dokumen_sub_visibilitas',  'sub_kamar_id', 'visibilitas'),
+        db.Index('idx_dokumen_sub_tahun',        'sub_kamar_id', 'created_at'),
+    )
 
     def __repr__(self):
         return f'<Dokumen {self.judul}>'
@@ -121,7 +123,6 @@ def init_db(app):
 def _seed_data():
     """Buat data awal: superadmin + 5 kamar default."""
 
-    # Buat superadmin jika belum ada
     if not User.query.filter_by(role='superadmin').first():
         superadmin = User(
             nama  = 'Super Admin',
@@ -130,9 +131,8 @@ def _seed_data():
         )
         superadmin.set_password('SuperAdmin@2026')
         db.session.add(superadmin)
-        print('[SEED] Superadmin dibuat: superadmin@ppnp.ac.id / SuperAdmin@2026')
+        print('[SEED] Superadmin dibuat')
 
-    # Buat 5 kamar default jika belum ada
     if Kamar.query.count() == 0:
         kamar_default = [
             {'nama': 'Kepegawaian & Tatalaksana', 'deskripsi': 'Arsip dokumen kepegawaian dan tatalaksana instansi', 'status': 'aktif',    'urutan': 1},

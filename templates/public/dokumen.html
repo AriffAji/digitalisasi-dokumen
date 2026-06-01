@@ -214,6 +214,92 @@
   </div>
   {% endif %}
 
+  <!-- ===== PAGINATION (Flowbite Style) ===== -->
+  {% if pagination and pagination.pages > 1 %}
+  <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+
+    <!-- Info entri -->
+    <span class="text-sm text-gray-500">
+      Menampilkan
+      <span class="font-semibold text-gray-800">{{ ((pagination.page - 1) * 20) + 1 }}</span>
+      –
+      <span class="font-semibold text-gray-800">{{ [pagination.page * 20, pagination.total] | min }}</span>
+      dari
+      <span class="font-semibold text-gray-800">{{ pagination.total }}</span>
+      dokumen
+    </span>
+
+    <!-- Navigasi halaman -->
+    <nav aria-label="Navigasi halaman dokumen">
+      <ul class="flex -space-x-px text-sm">
+
+        <!-- Tombol Previous -->
+        <li>
+          {% if pagination.has_prev %}
+          <a href="{{ url_for('public.dokumen', kamar_id=kamar.id, sub_kamar_id=sub_kamar.id, page=pagination.prev_num, cari=cari, tahun=tahun, status=filter_status) }}"
+             class="flex items-center justify-center px-3 h-9 leading-tight text-gray-600 bg-white border border-gray-200 rounded-s-lg hover:bg-hijau-50 hover:text-hijau-600 transition-colors">
+            <span class="sr-only">Sebelumnya</span>
+            <svg class="w-4 h-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+            </svg>
+          </a>
+          {% else %}
+          <span class="flex items-center justify-center px-3 h-9 leading-tight text-gray-300 bg-white border border-gray-200 rounded-s-lg cursor-not-allowed">
+            <svg class="w-4 h-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+            </svg>
+          </span>
+          {% endif %}
+        </li>
+
+        <!-- Nomor Halaman -->
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+          {% if page_num %}
+            <li>
+              <a href="{{ url_for('public.dokumen', kamar_id=kamar.id, sub_kamar_id=sub_kamar.id, page=page_num, cari=cari, tahun=tahun, status=filter_status) }}"
+                 {% if page_num == pagination.page %}aria-current="page"{% endif %}
+                 class="flex items-center justify-center w-9 h-9 leading-tight border border-gray-200 transition-colors font-medium text-sm
+                        {% if page_num == pagination.page %}
+                          text-white bg-hijau-600 border-hijau-600 hover:bg-hijau-700
+                        {% else %}
+                          text-gray-600 bg-white hover:bg-hijau-50 hover:text-hijau-600
+                        {% endif %}">
+                {{ page_num }}
+              </a>
+            </li>
+          {% else %}
+            <li>
+              <span class="flex items-center justify-center w-9 h-9 leading-tight text-gray-400 bg-white border border-gray-200 text-sm">
+                …
+              </span>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        <!-- Tombol Next -->
+        <li>
+          {% if pagination.has_next %}
+          <a href="{{ url_for('public.dokumen', kamar_id=kamar.id, sub_kamar_id=sub_kamar.id, page=pagination.next_num, cari=cari, tahun=tahun, status=filter_status) }}"
+             class="flex items-center justify-center px-3 h-9 leading-tight text-gray-600 bg-white border border-gray-200 rounded-e-lg hover:bg-hijau-50 hover:text-hijau-600 transition-colors">
+            <span class="sr-only">Selanjutnya</span>
+            <svg class="w-4 h-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
+            </svg>
+          </a>
+          {% else %}
+          <span class="flex items-center justify-center px-3 h-9 leading-tight text-gray-300 bg-white border border-gray-200 rounded-e-lg cursor-not-allowed">
+            <svg class="w-4 h-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
+            </svg>
+          </span>
+          {% endif %}
+        </li>
+
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
 

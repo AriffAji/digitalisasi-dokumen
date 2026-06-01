@@ -31,6 +31,11 @@ class Config:
     # Set True jika sudah pakai HTTPS (aktifkan saat deploy Agustus)
     SESSION_COOKIE_SECURE = False
 
+    # ===== CACHING =====
+    CACHE_TYPE           = 'SimpleCache'  # In-memory cache, tidak perlu Redis
+    CACHE_DEFAULT_TIMEOUT = 300           # Default 5 menit
+    CACHE_THRESHOLD      = 500            # Max 500 item di cache
+
     # Info instansi
     INSTANSI_NAMA     = 'PPNP'
     INSTANSI_LENGKAP  = 'Politeknik Pertanian Negeri Payakumbuh'

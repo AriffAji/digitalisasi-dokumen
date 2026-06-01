@@ -5,6 +5,7 @@ from blueprints.admin import admin_bp
 from decorators import admin_required
 from models import db, User, Kamar, SubKamar, Dokumen
 from werkzeug.utils import secure_filename
+from blueprints.public.routes import clear_dokumen_cache
 
 def validate_password(password):
     import re
@@ -193,6 +194,7 @@ def dokumen_upload():
     current_app.logger.info(
         f'UPLOAD: {current_user.email} | dokumen="{judul}" | sub_kamar={sk.nama}'
     )
+    clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=current_user.kamar_id)
     flash(f'Dokumen "{judul}" berhasil diupload.', 'success')
     return redirect(url_for('admin.dokumen', sub_kamar_id=sub_kamar_id))
 
@@ -240,12 +242,14 @@ def dokumen_hapus(dok_id):
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    judul = dok.judul
+    judul        = dok.judul
+    sub_kamar_id = dok.sub_kamar_id
     db.session.delete(dok)
     db.session.commit()
     current_app.logger.warning(
         f'HAPUS DOKUMEN: {current_user.email} | dokumen="{judul}"'
     )
+    clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=current_user.kamar_id)
     flash(f'Dokumen "{judul}" berhasil dihapus.', 'success')
     return redirect(url_for('admin.dokumen'))
 

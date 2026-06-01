@@ -5,7 +5,7 @@ from flask import Flask, render_template, session
 from flask_login import LoginManager
 from config import config
 from models import db, init_db, User
-from extensions import csrf
+from extensions import csrf, cache
 
 def setup_logging(app):
     # Setup logging ke file logs/siadik.log dengan auto-rotation
@@ -44,6 +44,9 @@ def create_app(config_name='default'):
 
     # Init CSRF Protection
     csrf.init_app(app)
+
+    # Init Cache
+    cache.init_app(app)
 
     # Aktifkan permanent session
     @app.before_request
