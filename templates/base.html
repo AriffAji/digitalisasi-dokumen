@@ -18,6 +18,9 @@
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
+  <!-- AOS (Animate On Scroll) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
+
   <script>
     // Tailwind custom config warna PPNP
     tailwind.config = {
@@ -75,15 +78,58 @@
     }
 
     /* Material Icons align */
-    .material-icons-round {
-      vertical-align: middle;
-      font-size: 20px;
-    }
+    .material-icons-round { vertical-align: middle; font-size: 20px; }
 
     /* Active nav link */
     .nav-active {
       background-color: rgba(255,255,255,0.15);
       border-left: 3px solid #ffffff;
+    }
+
+    /* ===== SKELETON LOADING ===== */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position:  200% 0; }
+    }
+
+    /* ===== SMOOTH MODAL TRANSITIONS ===== */
+    [data-modal-target] { transition: all 0.2s ease; }
+    .modal-transition {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* ===== HOVER CARD ANIMATION ===== */
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -8px rgba(32, 90, 40, 0.15);
+    }
+
+    /* ===== COUNTER ANIMATION ===== */
+    .counter { transition: all 0.3s ease; }
+
+    /* ===== LIVE SEARCH HIGHLIGHT ===== */
+    .search-highlight {
+      background: #fef9c3;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
+    /* ===== PAGE TRANSITION ===== */
+    .page-enter {
+      animation: pageEnter 0.4s ease-out;
+    }
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 
@@ -305,18 +351,47 @@
   <!-- Flowbite JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
+  <!-- AOS JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
   <!-- Flash Message Auto-Hide -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const flashes = document.querySelectorAll('.flash-message');
-      flashes.forEach(el => {
-        // Auto-hide setelah 4 detik
-        setTimeout(() => {
+      // Init AOS
+      AOS.init({
+        duration: 600,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 50,
+      });
+
+      // Flash auto-hide
+      setTimeout(() => {
+        document.querySelectorAll('.flash-message').forEach(el => {
           el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
           el.style.opacity = '0';
           el.style.transform = 'translateY(-8px)';
           setTimeout(() => el.remove(), 500);
-        }, 4000);
+        });
+      }, 4000);
+
+      // Page enter animation
+      document.querySelector('main')?.classList.add('page-enter');
+
+      // Counter animation
+      document.querySelectorAll('[data-counter]').forEach(el => {
+        const target = parseInt(el.getAttribute('data-counter'));
+        const duration = 1500;
+        const step = target / (duration / 16);
+        let current = 0;
+        const timer = setInterval(() => {
+          current += step;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          el.textContent = Math.floor(current).toLocaleString('id-ID');
+        }, 16);
       });
     });
   </script>

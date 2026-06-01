@@ -9,13 +9,11 @@
     <div class="flex flex-col md:flex-row items-center justify-between gap-8">
 
       <!-- Teks Hero -->
-      <div class="flex-1">
-        <!-- Badge fokus tahun ini -->
+      <div class="flex-1" data-aos="fade-right">
         <div class="inline-flex items-center gap-2 bg-white/15 rounded-full px-4 py-1.5 mb-4">
           <span class="material-icons-round text-yellow-300" style="font-size:16px;">star</span>
           <span class="text-sm font-semibold text-green-100">Fokus Tahap Ini: Kamar Kepegawaian {{ TAHUN_FOKUS }}</span>
         </div>
-
         <h1 class="text-3xl sm:text-4xl font-extrabold leading-tight mb-3">
           Sistem Informasi<br/>
           <span class="text-green-200">Arsip Digital Kepegawaian</span>
@@ -23,9 +21,7 @@
         <p class="text-green-100 text-base leading-relaxed max-w-lg">
           Platform terpusat pengelolaan arsip dokumen kepegawaian
           <strong class="text-white">{{ INSTANSI_LENGKAP }}</strong>.
-          Akses dokumen kapan saja, di mana saja.
         </p>
-
         <div class="flex flex-wrap gap-3 mt-6">
           <a href="#kamar"
              class="bg-white text-hijau-600 hover:bg-green-50 px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all shadow-sm">
@@ -42,24 +38,27 @@
         </div>
       </div>
 
-      <!-- Statistik -->
-      <div class="grid grid-cols-3 gap-4 w-full md:w-auto">
+      <!-- Statistik dengan Counter Animation -->
+      <div class="grid grid-cols-3 gap-4 w-full md:w-auto" data-aos="fade-left" data-aos-delay="200">
         <div class="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-          <div class="text-3xl font-black text-white">{{ total_dokumen }}</div>
+          <div class="text-3xl font-black text-white counter"
+               data-counter="{{ total_dokumen }}">0</div>
           <div class="text-green-200 text-xs font-medium mt-1 flex items-center justify-center gap-1">
             <span class="material-icons-round" style="font-size:14px;">description</span>
             Total Dokumen
           </div>
         </div>
         <div class="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-          <div class="text-3xl font-black text-white">{{ kamar_aktif }}</div>
+          <div class="text-3xl font-black text-white counter"
+               data-counter="{{ kamar_aktif }}">0</div>
           <div class="text-green-200 text-xs font-medium mt-1 flex items-center justify-center gap-1">
             <span class="material-icons-round" style="font-size:14px;">meeting_room</span>
             Kamar Aktif
           </div>
         </div>
         <div class="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-          <div class="text-3xl font-black text-white">{{ upload_bulan_ini }}</div>
+          <div class="text-3xl font-black text-white counter"
+               data-counter="{{ upload_bulan_ini }}">0</div>
           <div class="text-green-200 text-xs font-medium mt-1 flex items-center justify-center gap-1">
             <span class="material-icons-round" style="font-size:14px;">upload_file</span>
             Upload Bulan Ini
@@ -74,7 +73,7 @@
 <!-- ===== KAMAR ARSIP ===== -->
 <section id="kamar" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-  <div class="flex items-center justify-between mb-8">
+  <div class="flex items-center justify-between mb-8" data-aos="fade-up">
     <div>
       <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
         <span class="material-icons-round text-hijau-600">folder_open</span>
@@ -84,36 +83,31 @@
     </div>
   </div>
 
+  {% if kamar_list %}
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for kamar in kamar_list %}
-    <div class="relative group">
+    <div class="relative group" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
 
       {% if kamar.status == 'aktif' %}
-      <!-- Kamar Aktif -->
       <a href="{{ url_for('public.kamar', kamar_id=kamar.id) }}"
-         class="block bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 overflow-hidden">
-
-        <!-- Top accent -->
+         class="card-hover block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="h-1.5 bg-hijau-600"></div>
-
         <div class="p-6">
           <div class="flex items-start justify-between mb-4">
-            <div class="bg-hijau-50 rounded-xl p-3">
+            <div class="bg-hijau-50 rounded-xl p-3 transition-colors group-hover:bg-hijau-100">
               <span class="material-icons-round text-hijau-600" style="font-size:28px;">folder_special</span>
             </div>
             <span class="bg-green-100 text-hijau-700 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-              <span class="w-1.5 h-1.5 bg-hijau-500 rounded-full"></span>
+              <span class="w-1.5 h-1.5 bg-hijau-500 rounded-full animate-pulse"></span>
               Aktif
             </span>
           </div>
-
           <h3 class="font-bold text-gray-800 text-lg mb-1 group-hover:text-hijau-600 transition-colors">
             {{ kamar.nama }}
           </h3>
           <p class="text-gray-500 text-sm leading-relaxed mb-4">
             {{ kamar.deskripsi or 'Arsip dokumen ' ~ kamar.nama }}
           </p>
-
           <div class="flex items-center justify-between pt-4 border-t border-gray-50">
             <span class="text-xs text-gray-400 flex items-center gap-1">
               <span class="material-icons-round" style="font-size:14px;">description</span>
@@ -128,12 +122,8 @@
       </a>
 
       {% else %}
-      <!-- Kamar Terkunci -->
-      <div class="block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden opacity-75 cursor-not-allowed">
-
-        <!-- Top accent -->
-        <div class="h-1.5 bg-gray-300"></div>
-
+      <div class="block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden opacity-60 cursor-not-allowed">
+        <div class="h-1.5 bg-gray-200"></div>
         <div class="p-6">
           <div class="flex items-start justify-between mb-4">
             <div class="bg-gray-100 rounded-xl p-3">
@@ -144,12 +134,8 @@
               Segera Hadir
             </span>
           </div>
-
           <h3 class="font-bold text-gray-400 text-lg mb-1">{{ kamar.nama }}</h3>
-          <p class="text-gray-300 text-sm leading-relaxed mb-4">
-            {{ kamar.deskripsi or 'Sedang dalam pengembangan' }}
-          </p>
-
+          <p class="text-gray-300 text-sm leading-relaxed mb-4">Sedang dalam pengembangan</p>
           <div class="flex items-center justify-between pt-4 border-t border-gray-50">
             <span class="text-xs text-gray-300 flex items-center gap-1">
               <span class="material-icons-round" style="font-size:14px;">schedule</span>
@@ -168,11 +154,32 @@
     {% endfor %}
   </div>
 
+  {% else %}
+  <!-- Empty state ilustratif -->
+  <div class="text-center py-20 bg-white rounded-2xl border border-gray-100" data-aos="fade-up">
+    <div class="relative inline-block mb-6">
+      <div class="w-24 h-24 bg-hijau-50 rounded-full flex items-center justify-center mx-auto">
+        <span class="material-icons-round text-hijau-300" style="font-size:48px;">folder_open</span>
+      </div>
+      <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+        <span class="material-icons-round text-yellow-500" style="font-size:18px;">add</span>
+      </div>
+    </div>
+    <h3 class="text-lg font-bold text-gray-700 mb-2">Belum Ada Kamar Arsip</h3>
+    <p class="text-gray-400 text-sm max-w-sm mx-auto">Kamar arsip akan ditambahkan oleh superadmin. Silakan login untuk mengelola sistem.</p>
+    <a href="{{ url_for('auth.login') }}"
+       class="inline-flex items-center gap-2 bg-hijau-600 hover:bg-hijau-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl mt-6 transition-all">
+      <span class="material-icons-round" style="font-size:16px;">login</span>
+      Masuk sebagai Admin
+    </a>
+  </div>
+  {% endif %}
+
 </section>
 
 <!-- ===== INFO BANNER ===== -->
 {% if not current_user.is_authenticated %}
-<section class="bg-hijau-50 border-y border-hijau-100">
+<section class="bg-hijau-50 border-y border-hijau-100" data-aos="fade-up">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -181,7 +188,7 @@
         </div>
         <div>
           <p class="font-semibold text-hijau-800 text-sm">Ingin akses dokumen internal?</p>
-          <p class="text-hijau-600 text-xs mt-0.5">Login dengan akun kepegawaian untuk melihat semua dokumen termasuk SK, Kontrak, dan SKP.</p>
+          <p class="text-hijau-600 text-xs mt-0.5">Login untuk melihat semua dokumen termasuk SK, Kontrak, dan SKP.</p>
         </div>
       </div>
       <a href="{{ url_for('auth.login') }}"

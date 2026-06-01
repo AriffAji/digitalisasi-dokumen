@@ -23,7 +23,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
   <!-- Header -->
-  <div class="mb-6">
+  <div class="mb-6" data-aos="fade-down">
     <p class="text-gray-400 text-sm flex items-center gap-1 mb-1">
       <span class="material-icons-round" style="font-size:14px;">folder_special</span>
       {{ kamar.nama }}
@@ -36,14 +36,15 @@
   </div>
 
   <!-- Filter Bar -->
-  <form method="GET" action="" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+  <form method="GET" action="" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6" data-aos="fade-up" data-aos-delay="100">
     <div class="flex flex-col sm:flex-row gap-3">
 
       <!-- Cari -->
       <div class="relative flex-1">
         <span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" style="font-size:18px;">search</span>
-        <input type="text" name="cari" value="{{ cari }}"
+        <input type="text" name="cari" id="liveSearch" value="{{ cari }}"
                placeholder="Cari judul atau nomor dokumen..."
+               autocomplete="off"
                class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500 bg-gray-50" />
       </div>
 
@@ -128,7 +129,7 @@
 
   <!-- Tabel Dokumen -->
   {% if dokumen_list %}
-  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-aos="fade-up" data-aos-delay="150">
     <div class="overflow-x-auto">
       <table class="w-full text-sm" id="dokumenTable">
         <thead>
@@ -303,4 +304,33 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}{% endblock %}
+{% block extra_js %}
+<script>
+  // ===== Loading Skeleton =====
+  function showSkeleton() {
+    const table = document.querySelector('[data-aos]');
+    if (!table) return;
+    table.style.opacity = '0.5';
+    table.style.transition = 'opacity 0.2s ease';
+  }
+
+  // ===== Live Search dengan debounce =====
+  const searchInput = document.getElementById('liveSearch');
+  if (searchInput) {
+    let debounceTimer;
+    searchInput.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      const query = this.value.trim();
+      if (query.length >= 2 || query === '') {
+        debounceTimer = setTimeout(() => {
+          showSkeleton();
+          this.closest('form').submit();
+        }, 400);
+      }
+    });
+  }
+
+  // Skeleton saat filter form submit
+  document.querySelector('form[method="GET"]')?.addEventListener('submit', showSkeleton);
+</script>
+{% endblock %}
