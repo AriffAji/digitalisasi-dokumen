@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Link Tidak Valid{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center px-4">
+  <div class="text-center">
+    <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+      <span class="material-icons-round text-merah-600" style="font-size:48px;">link_off</span>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">Link Tidak Valid</h1>
+    <p class="text-gray-500 mb-8 max-w-sm mx-auto">{{ pesan }}</p>
+    <a href="{{ url_for('public.index') }}"
+       class="bg-hijau-600 hover:bg-hijau-700 text-white px-6 py-3 rounded-xl font-semibold inline-flex items-center gap-2 transition-all">
+      <span class="material-icons-round">home</span>
+      Kembali ke Beranda
+    </a>
+  </div>
+</div>
+{% endblock %}

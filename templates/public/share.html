@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Akses Dokumen — {{ dok.judul }}{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-lg">
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+
+      <!-- Header -->
+      <div class="bg-hijau-600 px-6 py-6 text-white">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="bg-white/20 rounded-xl p-2.5">
+            <span class="material-icons-round" style="font-size:24px;">link</span>
+          </div>
+          <div>
+            <p class="text-green-200 text-xs font-medium">Akses Dokumen via Link</p>
+            <h1 class="font-bold text-lg">{{ SISTEM_NAMA }} — {{ INSTANSI_NAMA }}</h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Dokumen -->
+      <div class="p-6">
+        <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
+          <div class="flex items-start gap-3">
+            <span class="material-icons-round text-hijau-600 mt-0.5" style="font-size:24px;">description</span>
+            <div class="flex-1">
+              <h2 class="font-bold text-gray-800 text-lg">{{ dok.judul }}</h2>
+              {% if dok.nomor_dokumen %}
+              <span class="font-mono text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded mt-1 inline-block">
+                {{ dok.nomor_dokumen }}
+              </span>
+              {% endif %}
+              <p class="text-gray-500 text-xs mt-2 flex items-center gap-1">
+                <span class="material-icons-round" style="font-size:12px;">folder</span>
+                {{ dok.sub_kamar.kamar.nama }} → {{ dok.sub_kamar.nama }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Link -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+          <div class="flex items-start gap-2">
+            <span class="material-icons-round text-amber-500 mt-0.5" style="font-size:18px;">info</span>
+            <div class="text-sm text-amber-800">
+              <p class="font-semibold mb-1">Informasi Akses</p>
+              <ul class="space-y-1 text-xs">
+                <li class="flex items-center gap-1">
+                  <span class="material-icons-round" style="font-size:12px;">schedule</span>
+                  Link berakhir: <strong>{{ share.expired_at.strftime('%d %B %Y, %H:%M') }} WIB</strong>
+                </li>
+                <li class="flex items-center gap-1">
+                  <span class="material-icons-round" style="font-size:12px;">visibility</span>
+                  Sudah diakses: <strong>{{ share.jumlah_akses }}x</strong>
+                  {% if share.max_akses > 0 %}(maks. {{ share.max_akses }}x){% endif %}
+                </li>
+                <li class="flex items-center gap-1">
+                  <span class="material-icons-round" style="font-size:12px;">lock</span>
+                  Dokumen ini bersifat <strong>internal</strong> — jangan disebarluaskan
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a href="{{ url_for('public.serve_pdf', filename=dok.file_path) }}" target="_blank"
+             class="flex-1 flex items-center justify-center gap-2 bg-hijau-600 hover:bg-hijau-700 text-white font-semibold py-3 px-4 rounded-xl transition-all">
+            <span class="material-icons-round" style="font-size:20px;">visibility</span>
+            Buka Preview
+          </a>
+          <a href="{{ url_for('public.download_pdf', filename=dok.file_path) }}"
+             class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all">
+            <span class="material-icons-round" style="font-size:20px;">download</span>
+            Unduh PDF
+          </a>
+        </div>
+
+        <p class="text-center text-xs text-gray-400 mt-4">
+          © {{ TAHUN_FOKUS }} {{ SISTEM_NAMA }} — {{ INSTANSI_LENGKAP }}
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

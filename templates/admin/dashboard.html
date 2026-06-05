@@ -140,6 +140,8 @@
       <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Dokumen Terbaru</h2>
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {% if dokumen_terbaru %}
+        <!-- Desktop -->
+        <div class="hidden sm:block">
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 border-b border-gray-100">
@@ -166,6 +168,23 @@
             {% endfor %}
           </tbody>
         </table>
+        </div>
+        <!-- Mobile -->
+        <div class="sm:hidden divide-y divide-gray-50">
+          {% for dok in dokumen_terbaru %}
+          <div class="px-4 py-3 flex items-center justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-gray-800 text-sm truncate">{{ dok.judul }}</p>
+              <p class="text-gray-400 text-xs mt-0.5">{{ dok.sub_kamar.nama }} · {{ dok.created_at.strftime('%d %b %Y') }}</p>
+            </div>
+            {% if dok.status == 'aktif' %}
+            <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">Aktif</span>
+            {% else %}
+            <span class="bg-red-100 text-merah-600 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">Arsip</span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
         <div class="px-5 py-3 border-t border-gray-50">
           <a href="{{ url_for('admin.dokumen') }}" class="text-hijau-600 text-xs font-semibold hover:underline flex items-center gap-1">
             Lihat semua dokumen

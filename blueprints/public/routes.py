@@ -169,3 +169,36 @@ def clear_dokumen_cache(sub_kamar_id=None, kamar_id=None):
     if kamar_id:
         cache.delete(f'sub_kamar_{kamar_id}')
     cache.delete('kamar_list')
+
+@public_bp.route('/share/<token>')
+def akses_share_link(token):
+    """Akses dokumen internal via temporary share link."""
+    from models import ShareLink
+    from datetime import datetime
+
+    share = ShareLink.query.filter_by(token=token).first()
+
+    # Validasi link
+    if not share:
+        return render_template('public/share_invalid.html',
+            pesan="Link tidak ditemukan atau sudah tidak valid.")
+
+    if not share.is_valid:
+        if share.is_expired:
+            pesan = "Link ini sudah kedaluwarsa."
+        elif not share.is_aktif:
+            pesan = "Link ini telah dicabut oleh administrator."
+        else:
+            pesan = "Link ini sudah mencapai batas akses."
+        return render_template('public/share_invalid.html', pesan=pesan)
+
+    # Tambah counter akses
+    share.jumlah_akses += 1
+    from models import db
+    db.session.commit()
+
+    dok = share.dokumen
+    return render_template('public/share.html',
+        dok   = dok,
+        share = share,
+    )

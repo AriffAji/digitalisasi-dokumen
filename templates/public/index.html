@@ -39,29 +39,29 @@
       </div>
 
       <!-- Statistik dengan Counter Animation -->
-      <div class="grid grid-cols-3 gap-4 w-full md:w-auto" data-aos="fade-left" data-aos-delay="200">
-        <div class="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-          <div class="text-3xl font-black text-white counter"
+      <div class="grid grid-cols-3 sm:grid-cols-3 gap-3 w-full md:w-auto" data-aos="fade-left" data-aos-delay="200">
+        <div class="bg-white/10 backdrop-blur rounded-2xl p-3 sm:p-4 text-center border border-white/10">
+          <div class="text-2xl sm:text-3xl font-black text-white counter"
                data-counter="{{ total_dokumen }}">0</div>
           <div class="text-green-200 text-xs font-medium mt-1 flex items-center justify-center gap-1">
-            <span class="material-icons-round" style="font-size:14px;">description</span>
-            Total Dokumen
+            <span class="material-icons-round" style="font-size:12px;">description</span>
+            <span class="hidden sm:inline">Total </span>Dokumen
           </div>
         </div>
-        <div class="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-          <div class="text-3xl font-black text-white counter"
+        <div class="bg-white/10 backdrop-blur rounded-2xl p-3 sm:p-4 text-center border border-white/10">
+          <div class="text-2xl sm:text-3xl font-black text-white counter"
                data-counter="{{ kamar_aktif }}">0</div>
           <div class="text-green-200 text-xs font-medium mt-1 flex items-center justify-center gap-1">
-            <span class="material-icons-round" style="font-size:14px;">meeting_room</span>
-            Kamar Aktif
+            <span class="material-icons-round" style="font-size:12px;">meeting_room</span>
+            <span class="hidden sm:inline">Kamar </span>Aktif
           </div>
         </div>
-        <div class="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-          <div class="text-3xl font-black text-white counter"
+        <div class="bg-white/10 backdrop-blur rounded-2xl p-3 sm:p-4 text-center border border-white/10">
+          <div class="text-2xl sm:text-3xl font-black text-white counter"
                data-counter="{{ upload_bulan_ini }}">0</div>
           <div class="text-green-200 text-xs font-medium mt-1 flex items-center justify-center gap-1">
-            <span class="material-icons-round" style="font-size:14px;">upload_file</span>
-            Upload Bulan Ini
+            <span class="material-icons-round" style="font-size:12px;">upload_file</span>
+            <span class="hidden sm:inline">Upload </span>Bulan Ini
           </div>
         </div>
       </div>

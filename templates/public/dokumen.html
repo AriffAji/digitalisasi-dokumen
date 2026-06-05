@@ -129,81 +129,134 @@
 
   <!-- Tabel Dokumen -->
   {% if dokumen_list %}
-  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-aos="fade-up" data-aos-delay="150">
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm" id="dokumenTable">
-        <thead>
-          <tr class="bg-gray-50 border-b border-gray-100">
-            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">No</th>
-            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nomor Dokumen</th>
-            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Judul Dokumen</th>
-            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Visibilitas</th>
-            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tanggal</th>
-            <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-50">
-          {% for dok in dokumen_list %}
-          <tr class="hover:bg-gray-50 transition-colors dokumen-row">
-            <td class="px-6 py-4 text-gray-400 text-xs">{{ loop.index }}</td>
-            <td class="px-6 py-4">
-              <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                {{ dok.nomor_dokumen or '—' }}
-              </span>
-            </td>
-            <td class="px-6 py-4">
-              <span class="font-medium text-gray-800 dokumen-judul">{{ dok.judul }}</span>
-            </td>
-            <td class="px-6 py-4">
-              {% if dok.status == 'aktif' %}
-              <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
-                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Aktif
-              </span>
-              {% else %}
-              <span class="bg-red-100 text-merah-600 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
-                <span class="material-icons-round" style="font-size:12px;">archive</span> Arsip
-              </span>
-              {% endif %}
-            </td>
-            <td class="px-6 py-4">
-              {% if dok.visibilitas == 'publik' %}
-              <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
-                <span class="material-icons-round" style="font-size:12px;">public</span> Publik
-              </span>
-              {% else %}
-              <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
-                <span class="material-icons-round" style="font-size:12px;">lock</span> Internal
-              </span>
-              {% endif %}
-            </td>
-            <td class="px-6 py-4 text-gray-400 text-xs">
-              {{ dok.created_at.strftime('%d %b %Y') }}
-            </td>
-            <td class="px-6 py-4 text-center">
-              <div class="flex items-center justify-center gap-2">
-                <!-- Preview -->
-                <a href="{{ url_for('public.serve_pdf', filename=dok.file_path) }}"
-                   target="_blank"
-                   title="Preview"
-                   class="inline-flex items-center gap-1.5 bg-hijau-600 hover:bg-hijau-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
-                  <span class="material-icons-round" style="font-size:14px;">visibility</span>
-                  Preview
-                </a>
-                <!-- Download -->
-                <a href="{{ url_for('public.download_pdf', filename=dok.file_path) }}"
-                   title="Download"
-                   class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
-                  <span class="material-icons-round" style="font-size:14px;">download</span>
-                  Unduh
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <div data-aos="fade-up" data-aos-delay="150">
+
+    <!-- Desktop: Tabel -->
+    <div class="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-8">No</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nomor Dokumen</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Judul Dokumen</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Visibilitas</th>
+              <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tanggal</th>
+              <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            {% for dok in dokumen_list %}
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 text-gray-400 text-xs">{{ loop.index }}</td>
+              <td class="px-6 py-4">
+                <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                  {{ dok.nomor_dokumen or '—' }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="font-medium text-gray-800">{{ dok.judul }}</span>
+              </td>
+              <td class="px-6 py-4">
+                {% if dok.status == 'aktif' %}
+                <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
+                  <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Aktif
+                </span>
+                {% else %}
+                <span class="bg-red-100 text-merah-600 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
+                  <span class="material-icons-round" style="font-size:12px;">archive</span> Arsip
+                </span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4">
+                {% if dok.visibilitas == 'publik' %}
+                <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
+                  <span class="material-icons-round" style="font-size:12px;">public</span> Publik
+                </span>
+                {% else %}
+                <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 w-fit">
+                  <span class="material-icons-round" style="font-size:12px;">lock</span> Internal
+                </span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-gray-400 text-xs">
+                {{ dok.created_at.strftime('%d %b %Y') }}
+              </td>
+              <td class="px-6 py-4 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <a href="{{ url_for('public.serve_pdf', filename=dok.file_path) }}" target="_blank"
+                     class="inline-flex items-center gap-1.5 bg-hijau-600 hover:bg-hijau-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
+                    <span class="material-icons-round" style="font-size:14px;">visibility</span> Preview
+                  </a>
+                  <a href="{{ url_for('public.download_pdf', filename=dok.file_path) }}"
+                     class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
+                    <span class="material-icons-round" style="font-size:14px;">download</span> Unduh
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- Mobile: Card View -->
+    <div class="md:hidden space-y-3">
+      {% for dok in dokumen_list %}
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        <!-- Header card -->
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-gray-800 text-sm leading-snug">{{ dok.judul }}</p>
+            {% if dok.nomor_dokumen %}
+            <span class="font-mono text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded mt-1 inline-block">
+              {{ dok.nomor_dokumen }}
+            </span>
+            {% endif %}
+          </div>
+          <span class="text-xs text-gray-400 whitespace-nowrap">{{ dok.created_at.strftime('%d %b %Y') }}</span>
+        </div>
+
+        <!-- Badges -->
+        <div class="flex flex-wrap gap-2 mb-3">
+          {% if dok.status == 'aktif' %}
+          <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+            <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Aktif
+          </span>
+          {% else %}
+          <span class="bg-red-100 text-merah-600 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+            <span class="material-icons-round" style="font-size:12px;">archive</span> Arsip
+          </span>
+          {% endif %}
+
+          {% if dok.visibilitas == 'publik' %}
+          <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+            <span class="material-icons-round" style="font-size:12px;">public</span> Publik
+          </span>
+          {% else %}
+          <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+            <span class="material-icons-round" style="font-size:12px;">lock</span> Internal
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Tombol aksi -->
+        <div class="flex gap-2">
+          <a href="{{ url_for('public.serve_pdf', filename=dok.file_path) }}" target="_blank"
+             class="flex-1 flex items-center justify-center gap-1.5 bg-hijau-600 hover:bg-hijau-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all">
+            <span class="material-icons-round" style="font-size:14px;">visibility</span> Preview
+          </a>
+          <a href="{{ url_for('public.download_pdf', filename=dok.file_path) }}"
+             class="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all">
+            <span class="material-icons-round" style="font-size:14px;">download</span> Unduh
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
   </div>
 
   {% else %}

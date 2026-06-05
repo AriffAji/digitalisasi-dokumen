@@ -111,6 +111,41 @@ class Dokumen(db.Model):
         return f'<Dokumen {self.judul}>'
 
 
+class ShareLink(db.Model):
+    __tablename__ = 'share_links'
+
+    id          = db.Column(db.Integer, primary_key=True)
+    dokumen_id  = db.Column(db.Integer, db.ForeignKey('dokumen.id'), nullable=False, index=True)
+    token       = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    created_by  = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    expired_at  = db.Column(db.DateTime, nullable=False)
+    max_akses   = db.Column(db.Integer, default=0)  # 0 = unlimited
+    jumlah_akses= db.Column(db.Integer, default=0)
+    is_aktif    = db.Column(db.Boolean, default=True)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relasi
+    dokumen     = db.relationship('Dokumen', backref='share_links')
+    pembuat     = db.relationship('User', backref='share_links')
+
+    @property
+    def is_expired(self):
+        return datetime.utcnow() > self.expired_at
+
+    @property
+    def is_valid(self):
+        if not self.is_aktif:
+            return False
+        if self.is_expired:
+            return False
+        if self.max_akses > 0 and self.jumlah_akses >= self.max_akses:
+            return False
+        return True
+
+    def __repr__(self):
+        return f'<ShareLink {self.token}>'
+
+
 def init_db(app):
     """Inisialisasi database dan buat data awal jika belum ada."""
     db.init_app(app)

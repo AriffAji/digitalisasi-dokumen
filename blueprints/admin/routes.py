@@ -323,3 +323,87 @@ def api_sub_kamar():
     kamar_id = request.args.get('kamar_id', type=int) or current_user.kamar_id
     sub_kamar_list = SubKamar.query.filter_by(kamar_id=kamar_id).all()
     return jsonify([{'id': sk.id, 'nama': sk.nama} for sk in sub_kamar_list])
+
+# ===== SHARE LINK =====
+@admin_bp.route('/dokumen/<int:dok_id>/share/generate', methods=['POST'])
+@admin_required
+def share_link_generate(dok_id):
+    """Generate temporary share link untuk dokumen internal."""
+    import secrets
+    from datetime import datetime, timedelta
+    from models import ShareLink
+
+    dok = Dokumen.query.get_or_404(dok_id)
+    if dok.sub_kamar.kamar_id != current_user.kamar_id and not current_user.is_superadmin():
+        flash('Akses ditolak.', 'danger')
+        return redirect(url_for('admin.dokumen'))
+
+    if dok.visibilitas != 'internal':
+        flash('Share link hanya untuk dokumen internal.', 'warning')
+        return redirect(url_for('admin.dokumen'))
+
+    durasi_jam = request.form.get('durasi', 24, type=int)
+    max_akses  = request.form.get('max_akses', 0, type=int)
+
+    # Generate token unik
+    token = secrets.token_urlsafe(32)
+
+    share = ShareLink(
+        dokumen_id  = dok_id,
+        token       = token,
+        created_by  = current_user.id,
+        expired_at  = datetime.utcnow() + timedelta(hours=durasi_jam),
+        max_akses   = max_akses,
+    )
+    db.session.add(share)
+    db.session.commit()
+
+    current_app.logger.info(
+        f'SHARE LINK: {current_user.email} | dokumen="{dok.judul}" | durasi={durasi_jam}jam'
+    )
+
+    share_url = request.host_url + f'share/{token}'
+    flash(f'Share link berhasil dibuat! Berlaku {durasi_jam} jam.', 'success')
+    return redirect(url_for('admin.dokumen_share_list', dok_id=dok_id, new_token=token))
+
+
+@admin_bp.route('/dokumen/<int:dok_id>/share')
+@admin_required
+def dokumen_share_list(dok_id):
+    """Halaman kelola share links untuk satu dokumen."""
+    from models import ShareLink
+    dok = Dokumen.query.get_or_404(dok_id)
+    if dok.sub_kamar.kamar_id != current_user.kamar_id and not current_user.is_superadmin():
+        flash('Akses ditolak.', 'danger')
+        return redirect(url_for('admin.dokumen'))
+
+    share_links = ShareLink.query.filter_by(dokumen_id=dok_id)\
+        .order_by(ShareLink.created_at.desc()).all()
+    new_token   = request.args.get('new_token')
+
+    return render_template('admin/share_link.html',
+        dok         = dok,
+        share_links = share_links,
+        new_token   = new_token,
+        host_url    = request.host_url,
+    )
+
+
+@admin_bp.route('/share/<int:share_id>/cabut', methods=['POST'])
+@admin_required
+def share_link_cabut(share_id):
+    """Cabut/nonaktifkan share link."""
+    from models import ShareLink
+    share = ShareLink.query.get_or_404(share_id)
+    dok   = share.dokumen
+    if dok.sub_kamar.kamar_id != current_user.kamar_id and not current_user.is_superadmin():
+        flash('Akses ditolak.', 'danger')
+        return redirect(url_for('admin.dokumen'))
+
+    share.is_aktif = False
+    db.session.commit()
+    current_app.logger.warning(
+        f'CABUT SHARE LINK: {current_user.email} | dokumen="{dok.judul}"'
+    )
+    flash('Share link berhasil dicabut.', 'success')
+    return redirect(url_for('admin.dokumen_share_list', dok_id=dok.id))
