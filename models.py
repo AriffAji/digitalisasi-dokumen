@@ -56,10 +56,9 @@ class Kamar(db.Model):
 
     @property
     def total_dokumen(self):
-        total = 0
-        for sk in self.sub_kamar:
-            total += sk.dokumen.count()
-        return total
+        from sqlalchemy import func
+        result = db.session.query(func.count(Dokumen.id))            .join(SubKamar, Dokumen.sub_kamar_id == SubKamar.id)            .filter(SubKamar.kamar_id == self.id).scalar()
+        return result or 0
 
     def __repr__(self):
         return f'<Kamar {self.nama}>'
@@ -80,7 +79,9 @@ class SubKamar(db.Model):
 
     @property
     def total_dokumen(self):
-        return self.dokumen.count()
+        from sqlalchemy import func
+        result = db.session.query(func.count(Dokumen.id))            .filter(Dokumen.sub_kamar_id == self.id).scalar()
+        return result or 0
 
     def __repr__(self):
         return f'<SubKamar {self.nama}>'

@@ -244,3 +244,135 @@ def admin_reset_password(admin_id):
     )
     flash(f'Password admin "{u.nama}" berhasil direset.', 'success')
     return redirect(url_for('superadmin.admin_list'))
+
+# ===== KELOLA DOKUMEN (SEMUA KAMAR) =====
+@superadmin_bp.route('/dokumen')
+@superadmin_required
+def dokumen():
+    import os
+    kamar_list     = Kamar.query.filter_by(status='aktif').order_by(Kamar.urutan).all()
+    kamar_id       = request.args.get('kamar_id', type=int)
+    sub_kamar_id   = request.args.get('sub_kamar_id', type=int)
+
+    sub_kamar_list = []
+    if kamar_id:
+        sub_kamar_list = SubKamar.query.filter_by(kamar_id=kamar_id).all()
+
+    query = Dokumen.query.join(SubKamar).join(Kamar)
+    if sub_kamar_id:
+        query = query.filter(Dokumen.sub_kamar_id == sub_kamar_id)
+    elif kamar_id:
+        query = query.filter(SubKamar.kamar_id == kamar_id)
+
+    dokumen_list    = query.order_by(Dokumen.created_at.desc()).all()
+    kamar_aktif     = Kamar.query.get(kamar_id) if kamar_id else None
+    sub_kamar_aktif = SubKamar.query.get(sub_kamar_id) if sub_kamar_id else None
+
+    return render_template('superadmin/dokumen.html',
+        kamar_list      = kamar_list,
+        sub_kamar_list  = sub_kamar_list,
+        dokumen_list    = dokumen_list,
+        kamar_aktif     = kamar_aktif,
+        sub_kamar_aktif = sub_kamar_aktif,
+        kamar_id        = kamar_id,
+        sub_kamar_id    = sub_kamar_id,
+    )
+
+@superadmin_bp.route('/dokumen/upload', methods=['POST'])
+@superadmin_required
+def dokumen_upload():
+    import os, time
+    from werkzeug.utils import secure_filename
+    from flask import current_app
+
+    kamar_id     = request.form.get('kamar_id', type=int)
+    sub_kamar_id = request.form.get('sub_kamar_id', type=int)
+    nomor        = request.form.get('nomor_dokumen', '').strip()
+    judul        = request.form.get('judul', '').strip()
+    status       = request.form.get('status', 'aktif')
+    visibilitas  = request.form.get('visibilitas', 'internal')
+    file         = request.files.get('file')
+
+    if not sub_kamar_id or not judul or not file:
+        flash('Sub-kamar, judul, dan file wajib diisi.', 'danger')
+        return redirect(url_for('superadmin.dokumen', kamar_id=kamar_id))
+
+    sk = SubKamar.query.get(sub_kamar_id)
+    if not sk:
+        flash('Sub-kamar tidak valid.', 'danger')
+        return redirect(url_for('superadmin.dokumen'))
+
+    # Validasi file
+    if not ('.' in file.filename and file.filename.rsplit('.', 1)[1].lower() == 'pdf'):
+        flash('Hanya file PDF yang diizinkan.', 'danger')
+        return redirect(url_for('superadmin.dokumen', kamar_id=kamar_id))
+
+    header = file.read(4)
+    file.seek(0)
+    if header != b'%PDF':
+        flash('File tidak valid. Pastikan file adalah PDF asli.', 'danger')
+        return redirect(url_for('superadmin.dokumen', kamar_id=kamar_id))
+
+    # Potong nama file kalau > 200 karakter, judul tetap utuh di DB
+    filename = secure_filename(file.filename)
+    if len(filename) > 200:
+        name, ext = filename.rsplit('.', 1)
+        filename  = name[:195] + '.' + ext
+    unique_name = f"{int(time.time())}_{filename}"
+    file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name))
+
+    dok = Dokumen(
+        sub_kamar_id  = sub_kamar_id,
+        nomor_dokumen = nomor,
+        judul         = judul,
+        file_path     = unique_name,
+        status        = status,
+        visibilitas   = visibilitas,
+        uploaded_by   = current_user.id,
+    )
+    db.session.add(dok)
+    db.session.commit()
+
+    current_app.logger.info(
+        f'UPLOAD (SA): {current_user.email} | dokumen="{judul}" | kamar="{sk.kamar.nama}"'
+    )
+    from blueprints.public.routes import clear_dokumen_cache
+    clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=sk.kamar_id)
+
+    flash(f'Dokumen "{judul}" berhasil diupload.', 'success')
+    return redirect(url_for('superadmin.dokumen', kamar_id=sk.kamar_id, sub_kamar_id=sub_kamar_id))
+
+@superadmin_bp.route('/dokumen/<int:dok_id>/hapus', methods=['POST'])
+@superadmin_required
+def dokumen_hapus(dok_id):
+    import os
+    from flask import current_app
+    dok = Dokumen.query.get_or_404(dok_id)
+
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], dok.file_path)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    kamar_id     = dok.sub_kamar.kamar_id
+    sub_kamar_id = dok.sub_kamar_id
+    judul        = dok.judul
+
+    db.session.delete(dok)
+    db.session.commit()
+
+    current_app.logger.warning(
+        f'HAPUS DOKUMEN (SA): {current_user.email} | dokumen="{judul}"'
+    )
+    from blueprints.public.routes import clear_dokumen_cache
+    clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=kamar_id)
+
+    flash(f'Dokumen "{judul}" berhasil dihapus.', 'success')
+    return redirect(url_for('superadmin.dokumen', kamar_id=kamar_id))
+
+@superadmin_bp.route('/api/sub-kamar')
+@superadmin_required
+def api_sub_kamar():
+    kamar_id       = request.args.get('kamar_id', type=int)
+    sub_kamar_list = SubKamar.query.filter_by(kamar_id=kamar_id).all() if kamar_id else []
+    from flask import jsonify
+    return jsonify([{'id': sk.id, 'nama': sk.nama} for sk in sub_kamar_list])

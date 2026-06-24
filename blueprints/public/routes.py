@@ -17,9 +17,8 @@ def index():
         upload_bulan_ini = stats['upload_bulan_ini'],
     )
 
-@cache.cached(timeout=600, key_prefix='kamar_list')
+# Tidak di-cache karena SQLAlchemy object tidak aman di-cache lintas request
 def _get_kamar_list():
-    """Cache list kamar selama 10 menit."""
     return Kamar.query.order_by(Kamar.urutan).all()
 
 @cache.cached(timeout=300, key_prefix='statistik_beranda')
@@ -49,14 +48,9 @@ def kamar(kamar_id):
         sub_kamar_list = sub_kamar_list,
     )
 
+# Tidak di-cache karena SQLAlchemy object tidak aman di-cache lintas request
 def _get_sub_kamar_list(kamar_id):
-    """Cache list sub-kamar per kamar selama 10 menit."""
-    key = f'sub_kamar_{kamar_id}'
-    result = cache.get(key)
-    if result is None:
-        result = SubKamar.query.filter_by(kamar_id=kamar_id).all()
-        cache.set(key, result, timeout=600)
-    return result
+    return SubKamar.query.filter_by(kamar_id=kamar_id).all()
 
 @public_bp.route('/kamar/<int:kamar_id>/sub/<int:sub_kamar_id>')
 def dokumen(kamar_id, sub_kamar_id):

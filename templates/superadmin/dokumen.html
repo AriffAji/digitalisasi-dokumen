@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+{% block title %}Kelola Dokumen — Superadmin{% endblock %}
+
+{% block breadcrumb %}
+<div class="bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <nav class="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
+      <a href="{{ url_for('superadmin.dashboard') }}" class="hover:text-hijau-600 flex items-center gap-1 transition-colors">
+        <span class="material-icons-round" style="font-size:16px;">dashboard</span> Dashboard
+      </a>
+      <span class="material-icons-round text-gray-300" style="font-size:16px;">chevron_right</span>
+      <span class="text-hijau-600 font-semibold">Kelola Dokumen</span>
+      {% if kamar_aktif %}
+      <span class="material-icons-round text-gray-300" style="font-size:16px;">chevron_right</span>
+      <span class="text-gray-600">{{ kamar_aktif.nama }}</span>
+      {% endif %}
+    </nav>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-extrabold text-gray-800">Kelola Dokumen</h1>
+      <p class="text-gray-500 text-sm mt-1">Akses penuh ke semua kamar arsip</p>
+    </div>
+    <button data-modal-target="modalUpload" data-modal-toggle="modalUpload"
+            class="bg-hijau-600 hover:bg-hijau-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all shadow-sm">
+      <span class="material-icons-round" style="font-size:18px;">upload_file</span>
+      Upload Dokumen
+    </button>
+  </div>
+
+  <!-- Filter Kamar -->
+  <div class="flex flex-wrap gap-2 mb-4">
+    <a href="{{ url_for('superadmin.dokumen') }}"
+       class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5
+              {{ 'bg-hijau-600 text-white shadow-sm' if not kamar_id else 'bg-white border border-gray-200 text-gray-600 hover:border-hijau-300 hover:text-hijau-600' }}">
+      <span class="material-icons-round" style="font-size:14px;">folder_open</span> Semua Kamar
+    </a>
+    {% for k in kamar_list %}
+    <a href="{{ url_for('superadmin.dokumen', kamar_id=k.id) }}"
+       class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5
+              {{ 'bg-hijau-600 text-white shadow-sm' if kamar_id == k.id else 'bg-white border border-gray-200 text-gray-600 hover:border-hijau-300 hover:text-hijau-600' }}">
+      <span class="material-icons-round" style="font-size:14px;">folder_special</span>
+      {{ k.nama }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Filter Sub-Kamar -->
+  {% if sub_kamar_list %}
+  <div class="flex flex-wrap gap-2 mb-6">
+    <a href="{{ url_for('superadmin.dokumen', kamar_id=kamar_id) }}"
+       class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all
+              {{ 'bg-gray-800 text-white' if not sub_kamar_id else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+      Semua Sub-Kamar
+    </a>
+    {% for sk in sub_kamar_list %}
+    <a href="{{ url_for('superadmin.dokumen', kamar_id=kamar_id, sub_kamar_id=sk.id) }}"
+       class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1
+              {{ 'bg-gray-800 text-white' if sub_kamar_id == sk.id else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+      <span class="material-icons-round" style="font-size:12px;">folder</span>
+      {{ sk.nama }}
+      <span class="{% if sub_kamar_id == sk.id %}bg-white/20{% else %}bg-gray-200{% endif %} text-xs px-1.5 py-0.5 rounded-full">
+        {{ sk.total_dokumen }}
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Tabel Dokumen -->
+  {% if dokumen_list %}
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-100">
+            <th class="px-5 py-4 text-left text-xs font-bold text-gray-400 uppercase">No. Dokumen</th>
+            <th class="px-5 py-4 text-left text-xs font-bold text-gray-400 uppercase">Judul</th>
+            <th class="px-5 py-4 text-left text-xs font-bold text-gray-400 uppercase">Kamar / Sub-Kamar</th>
+            <th class="px-5 py-4 text-center text-xs font-bold text-gray-400 uppercase">Status</th>
+            <th class="px-5 py-4 text-center text-xs font-bold text-gray-400 uppercase">Visibilitas</th>
+            <th class="px-5 py-4 text-left text-xs font-bold text-gray-400 uppercase">Tanggal</th>
+            <th class="px-5 py-4 text-center text-xs font-bold text-gray-400 uppercase">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for dok in dokumen_list %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-5 py-4">
+              <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                {{ dok.nomor_dokumen or '—' }}
+              </span>
+            </td>
+            <td class="px-5 py-4 font-medium text-gray-800 max-w-[200px] truncate">{{ dok.judul }}</td>
+            <td class="px-5 py-4">
+              <p class="text-xs text-gray-500">{{ dok.sub_kamar.kamar.nama }}</p>
+              <p class="text-xs text-gray-400">{{ dok.sub_kamar.nama }}</p>
+            </td>
+            <td class="px-5 py-4 text-center">
+              {% if dok.status == 'aktif' %}
+              <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">Aktif</span>
+              {% else %}
+              <span class="bg-red-100 text-merah-600 text-xs font-semibold px-2.5 py-1 rounded-full">Arsip</span>
+              {% endif %}
+            </td>
+            <td class="px-5 py-4 text-center">
+              {% if dok.visibilitas == 'publik' %}
+              <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">Publik</span>
+              {% else %}
+              <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full">Internal</span>
+              {% endif %}
+            </td>
+            <td class="px-5 py-4 text-gray-400 text-xs">{{ dok.created_at.strftime('%d %b %Y') }}</td>
+            <td class="px-5 py-4">
+              <div class="flex items-center justify-center gap-2">
+                <a href="{{ url_for('public.serve_pdf', filename=dok.file_path) }}" target="_blank"
+                   class="bg-hijau-50 hover:bg-hijau-100 text-hijau-600 p-2 rounded-lg transition-colors" title="Preview">
+                  <span class="material-icons-round" style="font-size:16px;">open_in_new</span>
+                </a>
+                <button data-modal-target="modalHapus{{ dok.id }}" data-modal-toggle="modalHapus{{ dok.id }}"
+                        class="bg-red-50 hover:bg-red-100 text-merah-600 p-2 rounded-lg transition-colors" title="Hapus">
+                  <span class="material-icons-round" style="font-size:16px;">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="text-center py-16 bg-white rounded-2xl border border-gray-100">
+    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+      <span class="material-icons-round text-gray-300" style="font-size:40px;">description</span>
+    </div>
+    <p class="text-gray-500 font-medium">Belum ada dokumen.</p>
+    <p class="text-gray-400 text-sm mt-1">
+      {% if kamar_id %}Pilih sub-kamar lain atau {% endif %}upload dokumen baru.
+    </p>
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- ===== MODAL UPLOAD ===== -->
+<div id="modalUpload" tabindex="-1" aria-hidden="true"
+     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative p-4 w-full max-w-lg max-h-full">
+    <div class="relative bg-white rounded-2xl shadow-xl">
+      <div class="flex items-center justify-between p-5 border-b border-gray-100">
+        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <span class="material-icons-round text-hijau-600">upload_file</span>
+          Upload Dokumen
+        </h3>
+        <button data-modal-hide="modalUpload" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <form method="POST" action="{{ url_for('superadmin.dokumen_upload') }}" enctype="multipart/form-data" class="p-5 space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- Pilih Kamar -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Kamar <span class="text-merah-600">*</span></label>
+          <select name="kamar_id" id="kamarSelect" required onchange="loadSubKamar(this.value)"
+                  class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500 bg-white">
+            <option value="">-- Pilih Kamar --</option>
+            {% for k in kamar_list %}
+            <option value="{{ k.id }}" {{ 'selected' if kamar_id == k.id }}>{{ k.nama }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Pilih Sub-Kamar (dinamis) -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Sub-Kamar <span class="text-merah-600">*</span></label>
+          <select name="sub_kamar_id" id="subKamarSelect" required
+                  class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500 bg-white">
+            <option value="">-- Pilih Kamar dulu --</option>
+            {% if sub_kamar_list %}
+              {% for sk in sub_kamar_list %}
+              <option value="{{ sk.id }}" {{ 'selected' if sub_kamar_id == sk.id }}>{{ sk.nama }}</option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nomor Dokumen</label>
+            <input type="text" name="nomor_dokumen" placeholder="001/SK/2026"
+                   class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Status</label>
+            <select name="status" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500 bg-white">
+              <option value="aktif">Aktif</option>
+              <option value="arsip">Arsip</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Judul Dokumen <span class="text-merah-600">*</span></label>
+          <input type="text" name="judul" required placeholder="Judul lengkap dokumen..."
+                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-hijau-500" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Visibilitas</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-3 border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-hijau-300 transition-colors has-[:checked]:border-hijau-500 has-[:checked]:bg-hijau-50">
+              <input type="radio" name="visibilitas" value="internal" checked class="text-hijau-600" />
+              <div>
+                <div class="font-semibold text-gray-800 text-sm flex items-center gap-1">
+                  <span class="material-icons-round text-orange-500" style="font-size:16px;">lock</span> Internal
+                </div>
+                <div class="text-xs text-gray-400">Hanya user login</div>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-hijau-300 transition-colors has-[:checked]:border-hijau-500 has-[:checked]:bg-hijau-50">
+              <input type="radio" name="visibilitas" value="publik" class="text-hijau-600" />
+              <div>
+                <div class="font-semibold text-gray-800 text-sm flex items-center gap-1">
+                  <span class="material-icons-round text-blue-500" style="font-size:16px;">public</span> Publik
+                </div>
+                <div class="text-xs text-gray-400">Semua pengunjung</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">File PDF <span class="text-merah-600">*</span></label>
+
+          <!-- Alert inline -->
+          <div id="uploadAlertSA" class="hidden mb-3 flex items-center gap-3 p-3 rounded-xl border text-sm font-medium"></div>
+
+          <div id="dropZoneSA"
+               class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-hijau-300 transition-colors cursor-pointer"
+               onclick="document.getElementById('fileInputSA').click()"
+               ondragover="handleDragOverSA(event)"
+               ondragleave="handleDragLeaveSA(event)"
+               ondrop="handleDropSA(event)">
+            <span class="material-icons-round text-gray-400 mb-2" style="font-size:36px;" id="dropIconSA">picture_as_pdf</span>
+            <p class="text-gray-500 text-sm font-medium" id="fileNameSA">Drag & drop file PDF di sini</p>
+            <p class="text-gray-400 text-xs mt-1">atau <span class="text-hijau-600 font-semibold">klik untuk pilih file</span> · Maksimal 10MB</p>
+            <input type="file" id="fileInputSA" name="file" accept=".pdf" required class="hidden"
+                   onchange="updateFileNameSA(this.files[0])" />
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 bg-hijau-600 hover:bg-hijau-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+            <span class="material-icons-round" style="font-size:18px;">upload</span> Upload
+          </button>
+          <button type="button" data-modal-hide="modalUpload"
+                  class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl text-sm transition-all">
+            Batal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Hapus per Dokumen -->
+{% for dok in dokumen_list %}
+<div id="modalHapus{{ dok.id }}" tabindex="-1" aria-hidden="true"
+     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative p-4 w-full max-w-sm max-h-full">
+    <div class="relative bg-white rounded-2xl shadow-xl p-6 text-center">
+      <div class="bg-red-50 rounded-full p-3 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+        <span class="material-icons-round text-merah-600" style="font-size:32px;">delete_forever</span>
+      </div>
+      <h3 class="text-lg font-bold text-gray-800 mb-2">Hapus Dokumen?</h3>
+      <p class="text-gray-500 text-sm mb-6">
+        <strong>"{{ dok.judul }}"</strong> akan dihapus permanen beserta filenya.
+      </p>
+      <div class="flex gap-3">
+        <form method="POST" action="{{ url_for('superadmin.dokumen_hapus', dok_id=dok.id) }}" class="flex-1">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="w-full bg-merah-600 hover:bg-merah-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-all">
+            Ya, Hapus
+          </button>
+        </form>
+        <button type="button" data-modal-hide="modalHapus{{ dok.id }}"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl text-sm transition-all">
+          Batal
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Load sub-kamar dinamis saat pilih kamar
+  async function loadSubKamar(kamarId) {
+    const select = document.getElementById('subKamarSelect');
+    select.innerHTML = '<option value="">Memuat...</option>';
+    if (!kamarId) {
+      select.innerHTML = '<option value="">-- Pilih Kamar dulu --</option>';
+      return;
+    }
+    const res  = await fetch(`/superadmin/api/sub-kamar?kamar_id=${kamarId}`);
+    const data = await res.json();
+    select.innerHTML = '<option value="">-- Pilih Sub-Kamar --</option>';
+    data.forEach(sk => {
+      select.innerHTML += `<option value="${sk.id}">${sk.nama}</option>`;
+    });
+  }
+
+  // Drag & drop
+  function showAlertSA(message, type = 'error') {
+    const alert = document.getElementById('uploadAlertSA');
+    const styles = {
+      error:   'bg-red-50 border-red-200 text-red-800',
+      success: 'bg-green-50 border-green-200 text-green-800',
+      warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    };
+    alert.className = `mb-3 flex items-center gap-3 p-3 rounded-xl border text-sm font-medium ${styles[type]}`;
+    alert.innerHTML = `<span class="material-icons-round" style="font-size:18px;">${type === 'error' ? 'error' : type === 'success' ? 'check_circle' : 'warning'}</span><span class="flex-1">${message}</span>`;
+    alert.classList.remove('hidden');
+    setTimeout(() => alert.classList.add('hidden'), 4000);
+  }
+
+  function updateFileNameSA(file) {
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      showAlertSA('Hanya file PDF yang diizinkan!', 'error');
+      document.getElementById('fileInputSA').value = '';
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showAlertSA('Ukuran file maksimal 10MB!', 'warning');
+      document.getElementById('fileInputSA').value = '';
+      return;
+    }
+    const size = (file.size / 1024 / 1024).toFixed(2);
+    document.getElementById('fileNameSA').innerHTML = `<span class="text-hijau-600 font-semibold">${file.name}</span><br><span class="text-xs text-gray-400">${size} MB</span>`;
+    document.getElementById('dropIconSA').textContent = 'check_circle';
+    document.getElementById('dropIconSA').style.color = '#205A28';
+    document.getElementById('dropZoneSA').classList.add('border-hijau-400', 'bg-hijau-50');
+    showAlertSA(`File siap diupload! (${size} MB)`, 'success');
+  }
+
+  function handleDragOverSA(e) { e.preventDefault(); document.getElementById('dropZoneSA').classList.add('border-hijau-400', 'bg-hijau-50'); }
+  function handleDragLeaveSA(e) { e.preventDefault(); document.getElementById('dropZoneSA').classList.remove('border-hijau-400', 'bg-hijau-50'); }
+  function handleDropSA(e) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const input = document.getElementById('fileInputSA');
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    updateFileNameSA(file);
+  }
+</script>
+{% endblock %}

@@ -174,8 +174,11 @@ def dokumen_upload():
         flash('File tidak valid. Pastikan file adalah PDF asli.', 'danger')
         return redirect(url_for('admin.dokumen'))
 
-    # Simpan file
-    filename    = secure_filename(file.filename)
+    # Simpan file — potong nama jika terlalu panjang, judul tetap utuh di DB
+    filename = secure_filename(file.filename)
+    if len(filename) > 200:
+        name, ext = filename.rsplit('.', 1)
+        filename  = name[:195] + '.' + ext
     import time
     unique_name = f"{int(time.time())}_{filename}"
     file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name))
@@ -219,7 +222,10 @@ def dokumen_edit(dok_id):
         old_path = os.path.join(current_app.config['UPLOAD_FOLDER'], dok.file_path)
         if os.path.exists(old_path):
             os.remove(old_path)
-        filename    = secure_filename(file.filename)
+        filename = secure_filename(file.filename)
+        if len(filename) > 200:
+            name, ext = filename.rsplit('.', 1)
+            filename  = name[:195] + '.' + ext
         import time
         unique_name = f"{int(time.time())}_{filename}"
         file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], unique_name))
