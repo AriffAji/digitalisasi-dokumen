@@ -1,10 +1,18 @@
 import os
-from flask import render_template, abort, send_from_directory, current_app, make_response, request
+from datetime import datetime
+
+from flask import (
+    render_template, abort, send_from_directory, current_app, 
+    make_response, request, jsonify
+)
 from flask_login import current_user
+
 from blueprints.public import public_bp
-from models import db, Kamar, SubKamar, Dokumen
+from models import db, Kamar, SubKamar, Dokumen, ShareLink
 from extensions import cache
 
+
+# ===== BERANDA =====
 @public_bp.route('/')
 def index():
     """Beranda publik — tampilkan grid kamar dan statistik."""
@@ -17,14 +25,16 @@ def index():
         upload_bulan_ini = stats['upload_bulan_ini'],
     )
 
-# Tidak di-cache karena SQLAlchemy object tidak aman di-cache lintas request
+
+# ===== HELPER FUNCTIONS =====
 def _get_kamar_list():
+    """List semua kamar. Tidak di-cache karena SQLAlchemy object tidak aman di-cache lintas request."""
     return Kamar.query.order_by(Kamar.urutan).all()
+
 
 @cache.cached(timeout=300, key_prefix='statistik_beranda')
 def _get_statistik():
     """Cache statistik beranda selama 5 menit."""
-    from datetime import datetime
     bulan_ini = datetime.now().month
     tahun_ini = datetime.now().year
     return {
@@ -36,6 +46,27 @@ def _get_statistik():
         ).count()
     }
 
+
+def _get_sub_kamar_list(kamar_id):
+    """List sub-kamar dalam satu kamar."""
+    return SubKamar.query.filter_by(kamar_id=kamar_id).all()
+
+
+def clear_dokumen_cache(sub_kamar_id=None, kamar_id=None):
+    """
+    Clear cache yang relevan setelah ada perubahan dokumen.
+    Dipanggil dari admin routes setelah upload/hapus/edit.
+    """
+    cache.delete('statistik_beranda')
+    if sub_kamar_id:
+        for page in range(1, 10):
+            cache.delete(f'dokumen_publik_{sub_kamar_id}_page{page}')
+    if kamar_id:
+        cache.delete(f'sub_kamar_{kamar_id}')
+    cache.delete('kamar_list')
+
+
+# ===== KAMAR =====
 @public_bp.route('/kamar/<int:kamar_id>')
 def kamar(kamar_id):
     """Halaman list sub-kamar dalam satu kamar."""
@@ -48,10 +79,8 @@ def kamar(kamar_id):
         sub_kamar_list = sub_kamar_list,
     )
 
-# Tidak di-cache karena SQLAlchemy object tidak aman di-cache lintas request
-def _get_sub_kamar_list(kamar_id):
-    return SubKamar.query.filter_by(kamar_id=kamar_id).all()
 
+# ===== DOKUMEN =====
 @public_bp.route('/kamar/<int:kamar_id>/sub/<int:sub_kamar_id>')
 def dokumen(kamar_id, sub_kamar_id):
     """
@@ -133,15 +162,34 @@ def dokumen(kamar_id, sub_kamar_id):
 
     return response
 
+
+# ===== FILE SERVING =====
 @public_bp.route('/uploads/<path:filename>')
 def serve_pdf(filename):
-    """Serve PDF inline di browser."""
-    response = make_response(send_from_directory(
-        current_app.config['UPLOAD_FOLDER'], filename
-    ))
-    response.headers['Content-Disposition'] = 'inline'
-    response.headers['Content-Type'] = 'application/pdf'
-    return response
+    """Serve PDF inline di browser untuk preview."""
+    try:
+        # Validasi filename — cegah path traversal
+        if '..' in filename or filename.startswith('/'):
+            abort(400)
+        
+        # Send file dengan as_attachment=False untuk preview inline
+        response = send_from_directory(
+            current_app.config['UPLOAD_FOLDER'], 
+            filename,
+            as_attachment=False  # PENTING: ini bikin preview, bukan download
+        )
+        
+        # Set headers untuk preview (inline)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'inline; filename="{}"'.format(filename)
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        
+        return response
+    except FileNotFoundError:
+        abort(404)
+
 
 @public_bp.route('/download/<path:filename>')
 def download_pdf(filename):
@@ -151,25 +199,11 @@ def download_pdf(filename):
         as_attachment=True
     )
 
-def clear_dokumen_cache(sub_kamar_id=None, kamar_id=None):
-    """
-    Clear cache yang relevan setelah ada perubahan dokumen.
-    Dipanggil dari admin routes setelah upload/hapus/edit.
-    """
-    cache.delete('statistik_beranda')
-    if sub_kamar_id:
-        for page in range(1, 10):
-            cache.delete(f'dokumen_publik_{sub_kamar_id}_page{page}')
-    if kamar_id:
-        cache.delete(f'sub_kamar_{kamar_id}')
-    cache.delete('kamar_list')
 
+# ===== SHARE LINK =====
 @public_bp.route('/share/<token>')
 def akses_share_link(token):
     """Akses dokumen internal via temporary share link."""
-    from models import ShareLink
-    from datetime import datetime
-
     share = ShareLink.query.filter_by(token=token).first()
 
     # Validasi link
@@ -188,7 +222,6 @@ def akses_share_link(token):
 
     # Tambah counter akses
     share.jumlah_akses += 1
-    from models import db
     db.session.commit()
 
     dok = share.dokumen

@@ -158,14 +158,25 @@ def init_db(app):
 
 def _seed_data():
     """Buat data awal: superadmin + 5 kamar default."""
+    import os
+    from dotenv import load_dotenv
+    
+    load_dotenv()
 
     if not User.query.filter_by(role='superadmin').first():
+        # Ambil password superadmin dari .env, jangan hardcode
+        default_password = os.environ.get('SUPERADMIN_PASSWORD')
+        if not default_password:
+            print('[WARNING] SUPERADMIN_PASSWORD tidak ditemukan di .env!')
+            print('[INSTRUCTION] Silakan set SUPERADMIN_PASSWORD di .env dan jalankan init ulang.')
+            return
+        
         superadmin = User(
             nama  = 'Super Admin',
             email = 'superadmin@ppnp.ac.id',
             role  = 'superadmin'
         )
-        superadmin.set_password('SuperAdmin@2026')
+        superadmin.set_password(default_password)
         db.session.add(superadmin)
         print('[SEED] Superadmin dibuat')
 

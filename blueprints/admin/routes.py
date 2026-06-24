@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, flash, request, jsonify, c
 from flask_login import current_user
 from blueprints.admin import admin_bp
 from decorators import admin_required
-from models import db, User, Kamar, SubKamar, Dokumen
+from models import db, User, Kamar, SubKamar, Dokumen, ShareLink
 from werkzeug.utils import secure_filename
 from blueprints.public.routes import clear_dokumen_cache
 
@@ -235,29 +235,82 @@ def dokumen_edit(dok_id):
     flash(f'Dokumen "{dok.judul}" berhasil diperbarui.', 'success')
     return redirect(url_for('admin.dokumen', sub_kamar_id=dok.sub_kamar_id))
 
+# @admin_bp.route('/dokumen/<int:dok_id>/hapus', methods=['POST'])
+# @admin_required
+# def dokumen_hapus(dok_id):
+#     dok = Dokumen.query.get_or_404(dok_id)
+#     if dok.sub_kamar.kamar_id != current_user.kamar_id:
+#         flash('Akses ditolak.', 'danger')
+#         return redirect(url_for('admin.dokumen'))
+
+#     # Hapus file fisik
+#     file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], dok.file_path)
+#     if os.path.exists(file_path):
+#         os.remove(file_path)
+
+#     judul        = dok.judul
+#     sub_kamar_id = dok.sub_kamar_id
+#     db.session.delete(dok)
+#     db.session.commit()
+#     current_app.logger.warning(
+#         f'HAPUS DOKUMEN: {current_user.email} | dokumen="{judul}"'
+#     )
+#     clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=current_user.kamar_id)
+#     flash(f'Dokumen "{judul}" berhasil dihapus.', 'success')
+#     return redirect(url_for('admin.dokumen'))
+
 @admin_bp.route('/dokumen/<int:dok_id>/hapus', methods=['POST'])
 @admin_required
 def dokumen_hapus(dok_id):
+    """Hapus dokumen (cek share_links aktif dulu)."""
+    import os
+    from flask import current_app
+    
     dok = Dokumen.query.get_or_404(dok_id)
-    if dok.sub_kamar.kamar_id != current_user.kamar_id:
-        flash('Akses ditolak.', 'danger')
-        return redirect(url_for('admin.dokumen'))
+
+    # CEK: Ada share_link aktif yang masih valid?
+    active_shares = ShareLink.query.filter_by(
+        dokumen_id=dok_id,
+        is_aktif=True
+    ).all()
+    
+    # Filter share_links yang benar-benar masih valid (belum expired)
+    from datetime import datetime
+    valid_shares = [s for s in active_shares if not s.is_expired]
+    
+    # Jika ada share_link yang masih aktif dan belum expired, tolak delete
+    if valid_shares:
+        flash(
+            f'Dokumen "{dok.judul}" tidak bisa dihapus karena masih ada share link yang aktif. '
+            f'Silakan matikan share link terlebih dahulu.',
+            'danger'
+        )
+        return redirect(url_for('admin.dokumen', sub_kamar_id=dok.sub_kamar_id))
+
+    # Jika aman, hapus semua share_links (yang sudah expired atau inactive)
+    ShareLink.query.filter_by(dokumen_id=dok_id).delete()
 
     # Hapus file fisik
     file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], dok.file_path)
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    judul        = dok.judul
+    kamar_id     = dok.sub_kamar.kamar_id
     sub_kamar_id = dok.sub_kamar_id
+    judul        = dok.judul
+
+    # Baru hapus dokumen
     db.session.delete(dok)
     db.session.commit()
+
     current_app.logger.warning(
         f'HAPUS DOKUMEN: {current_user.email} | dokumen="{judul}"'
     )
-    clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=current_user.kamar_id)
+    from blueprints.public.routes import clear_dokumen_cache
+    clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=kamar_id)
+
     flash(f'Dokumen "{judul}" berhasil dihapus.', 'success')
-    return redirect(url_for('admin.dokumen'))
+    return redirect(url_for('admin.dokumen', sub_kamar_id=sub_kamar_id))
 
 # ===== USER =====
 @admin_bp.route('/user')
