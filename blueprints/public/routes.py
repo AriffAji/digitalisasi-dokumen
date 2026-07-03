@@ -163,6 +163,73 @@ def dokumen(kamar_id, sub_kamar_id):
     return response
 
 
+# ===== GLOBAL SEARCH =====
+@public_bp.route('/search')
+def global_search():
+    """Halaman search global dengan live search."""
+    return render_template('public/search.html')
+
+
+@public_bp.route('/api/global-search')
+def api_global_search():
+    """API live search — return JSON untuk semua kamar. Support filter tahun & status."""
+    q      = request.args.get('q', '').strip()
+    tahun  = request.args.get('tahun', '').strip()
+    status = request.args.get('status', '').strip()
+
+    if len(q) < 2:
+        return jsonify([])
+
+    query = Dokumen.query.filter(
+        Dokumen.visibilitas == 'publik',
+        db.or_(
+            Dokumen.judul.ilike(f'%{q}%'),
+            Dokumen.nomor_dokumen.ilike(f'%{q}%')
+        )
+    )
+
+    # Filter status
+    if status in ('aktif', 'arsip'):
+        query = query.filter(Dokumen.status == status)
+    else:
+        query = query.filter(Dokumen.status == 'aktif')
+
+    # Filter tahun
+    if tahun:
+        try:
+            query = query.filter(db.extract('year', Dokumen.created_at) == int(tahun))
+        except ValueError:
+            pass
+
+    hasil = query.order_by(Dokumen.created_at.desc()).all()
+
+    return jsonify([{
+        'id':           d.id,
+        'judul':        d.judul,
+        'nomor':        d.nomor_dokumen,
+        'kamar':        d.sub_kamar.kamar.nama,
+        'tipe':         d.sub_kamar.nama,
+        'status':       d.status,
+        'visibilitas':  d.visibilitas,
+        'tanggal':      d.created_at.strftime('%d %b %Y'),
+        'preview_url':  f'/uploads/{d.file_path}',
+        'download_url': f'/download/{d.file_path}',
+    } for d in hasil])
+
+
+@public_bp.route('/api/global-search-tahun')
+def api_global_search_tahun():
+    """API return daftar tahun unik untuk filter dropdown."""
+    tahun_list = db.session.query(
+        db.distinct(db.extract('year', Dokumen.created_at))
+    ).filter(
+        Dokumen.visibilitas == 'publik',
+        Dokumen.status == 'aktif'
+    ).all()
+    return jsonify(sorted([int(t[0]) for t in tahun_list if t[0]], reverse=True))
+# ===== END GLOBAL SEARCH =====
+
+
 # ===== FILE SERVING =====
 @public_bp.route('/uploads/<path:filename>')
 def serve_pdf(filename):

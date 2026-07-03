@@ -51,7 +51,7 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for sk in sub_kamar_list %}
-    <a href="{{ url_for('public.dokumen', kamar_id=kamar.id, sub_kamar_id=sk.id) }}"
+     <a href="{{ url_for('public.dokumen', kamar_id=kamar.id, sub_kamar_id=sk.id) }}"
        data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}"
        class="card-hover group bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
       <div class="bg-hijau-50 group-hover:bg-hijau-100 rounded-xl p-2.5 transition-colors">

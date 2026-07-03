@@ -160,11 +160,11 @@
              class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
             <span class="material-icons-round" style="font-size:18px;">home</span> Beranda
           </a>
-          <a href="#kamar"
+          <a href="{{ url_for('public.index') }}"
              class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
             <span class="material-icons-round" style="font-size:18px;">folder_open</span> Kamar Arsip
           </a>
-          <a href="#"
+          <a href="{{ url_for('public.global_search') }}"
              class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all">
             <span class="material-icons-round" style="font-size:18px;">search</span> Cari Dokumen
           </a>
@@ -234,7 +234,7 @@
            class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
           <span class="material-icons-round" style="font-size:18px;">folder_open</span> Kamar Arsip
         </a>
-        <a href="#"
+        <a href="{{ url_for('public.global_search') }}"
            class="text-green-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
           <span class="material-icons-round" style="font-size:18px;">search</span> Cari Dokumen
         </a>
@@ -302,7 +302,7 @@
               </a>
             </li>
             <li>
-              <a href="#kamar" class="text-red-100 hover:text-white flex items-center gap-1.5 transition-colors">
+              <a href="{{ url_for('public.index') }}" class="text-red-100 hover:text-white flex items-center gap-1.5 transition-colors">
                 <span class="material-icons-round" style="font-size:16px;">chevron_right</span> Kamar Arsip
               </a>
             </li>
