@@ -5,7 +5,6 @@ from blueprints.admin import admin_bp
 from decorators import admin_required
 from models import db, User, Kamar, SubKamar, Dokumen, ShareLink
 from werkzeug.utils import secure_filename
-from blueprints.public.routes import clear_dokumen_cache
 
 def validate_password(password):
     import re
@@ -306,7 +305,6 @@ def dokumen_hapus(dok_id):
     current_app.logger.warning(
         f'HAPUS DOKUMEN: {current_user.email} | dokumen="{judul}"'
     )
-    from blueprints.public.routes import clear_dokumen_cache
     clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=kamar_id)
 
     flash(f'Dokumen "{judul}" berhasil dihapus.', 'success')

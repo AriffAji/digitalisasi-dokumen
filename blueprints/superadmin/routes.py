@@ -458,6 +458,107 @@ def dokumen_hapus(dok_id):
 
 
 # ===== API ENDPOINTS =====
+
+@superadmin_bp.route('/dokumen/<int:dok_id>/edit', methods=['POST'])
+@superadmin_required
+def dokumen_edit(dok_id):
+    """Edit dokumen — ubah judul, nomor, status, visibilitas."""
+    dok = Dokumen.query.get_or_404(dok_id)
+
+    dok.judul         = request.form.get('judul', dok.judul).strip()
+    dok.nomor_dokumen = request.form.get('nomor_dokumen', '').strip() or None
+    dok.status        = request.form.get('status', dok.status)
+    dok.visibilitas   = request.form.get('visibilitas', dok.visibilitas)
+    dok.updated_at    = datetime.utcnow()
+
+    # BUGFIX: Jika visibilitas diubah ke publik, hapus semua share link
+    if dok.visibilitas == 'publik':
+        deleted_count = ShareLink.query.filter_by(dokumen_id=dok.id).delete()
+        if deleted_count > 0:
+            current_app.logger.info(
+                f'AUTO-HAPUS SHARE LINK (SA): {current_user.email} | dokumen="{dok.judul}" | {deleted_count} link dihapus (visibilitas → publik)'
+            )
+
+    db.session.commit()
+
+    current_app.logger.info(
+        f'EDIT DOKUMEN (SA): {current_user.email} | dokumen="{dok.judul}" | vis={dok.visibilitas}'
+    )
+    from blueprints.public.routes import clear_dokumen_cache
+    clear_dokumen_cache(sub_kamar_id=dok.sub_kamar_id, kamar_id=dok.sub_kamar.kamar_id)
+
+    flash(f'Dokumen "{dok.judul}" berhasil diperbarui.', 'success')
+    return redirect(url_for('superadmin.dokumen', kamar_id=dok.sub_kamar.kamar_id))
+
+
+@superadmin_bp.route('/dokumen/<int:dok_id>/share', methods=['GET'])
+@superadmin_required
+def dokumen_share_list(dok_id):
+    """Halaman kelola share links untuk satu dokumen."""
+    dok = Dokumen.query.get_or_404(dok_id)
+    share_links = ShareLink.query.filter_by(dokumen_id=dok_id)\
+        .order_by(ShareLink.created_at.desc()).all()
+    new_token = request.args.get('new_token')
+
+    return render_template('superadmin/share_link.html',
+        dok         = dok,
+        share_links = share_links,
+        new_token   = new_token,
+        host_url    = request.host_url,
+    )
+
+
+@superadmin_bp.route('/dokumen/<int:dok_id>/share/generate', methods=['POST'])
+@superadmin_required
+def share_link_generate(dok_id):
+    """Generate temporary share link untuk dokumen internal."""
+    import secrets
+    from datetime import timedelta
+
+    dok = Dokumen.query.get_or_404(dok_id)
+
+    if dok.visibilitas != 'internal':
+        flash('Share link hanya untuk dokumen internal.', 'warning')
+        return redirect(url_for('superadmin.dokumen'))
+
+    durasi_jam = request.form.get('durasi', 24, type=int)
+    max_akses  = request.form.get('max_akses', 0, type=int)
+
+    token = secrets.token_urlsafe(32)
+    share = ShareLink(
+        dokumen_id = dok.id,
+        token      = token,
+        created_by = current_user.id,
+        expired_at = datetime.utcnow() + timedelta(hours=durasi_jam),
+        max_akses  = max_akses,
+    )
+    db.session.add(share)
+    db.session.commit()
+
+    current_app.logger.info(
+        f'SHARE LINK (SA): {current_user.email} | dokumen="{dok.judul}" | durasi={durasi_jam}jam'
+    )
+
+    flash(f'Share link berhasil dibuat! Berlaku {durasi_jam} jam.', 'success')
+    return redirect(url_for('superadmin.dokumen_share_list', dok_id=dok_id, new_token=token))
+
+
+@superadmin_bp.route('/share/<int:share_id>/cabut', methods=['POST'])
+@superadmin_required
+def share_link_cabut(share_id):
+    """Cabut/nonaktifkan share link."""
+    share = ShareLink.query.get_or_404(share_id)
+    dok   = share.dokumen
+
+    share.is_aktif = False
+    db.session.commit()
+    current_app.logger.warning(
+        f'CABUT SHARE LINK (SA): {current_user.email} | dokumen="{dok.judul}"'
+    )
+    flash('Share link berhasil dicabut.', 'success')
+    return redirect(url_for('superadmin.dokumen_share_list', dok_id=dok.id))
+
+
 @superadmin_bp.route('/api/sub-kamar')
 @superadmin_required
 def api_sub_kamar():
