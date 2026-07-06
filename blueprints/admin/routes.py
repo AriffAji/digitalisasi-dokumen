@@ -198,7 +198,7 @@ def dokumen_upload():
     )
     clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=current_user.kamar_id)
     flash(f'Dokumen "{judul}" berhasil diupload.', 'success')
-    return redirect(url_for('admin.dokumen', sub_kamar_id=sub_kamar_id))
+    return redirect(url_for('admin.dokumen') + '?sub_kamar_id=' + str(sub_kamar_id))
 
 @admin_bp.route('/dokumen/<int:dok_id>/edit', methods=['POST'])
 @admin_required
@@ -232,7 +232,7 @@ def dokumen_edit(dok_id):
 
     db.session.commit()
     flash(f'Dokumen "{dok.judul}" berhasil diperbarui.', 'success')
-    return redirect(url_for('admin.dokumen', sub_kamar_id=dok.sub_kamar_id))
+    return redirect(url_for('admin.dokumen') + '?sub_kamar_id=' + str(dok.sub_kamar_id))
 
 # @admin_bp.route('/dokumen/<int:dok_id>/hapus', methods=['POST'])
 # @admin_required
@@ -284,7 +284,7 @@ def dokumen_hapus(dok_id):
             f'Silakan matikan share link terlebih dahulu.',
             'danger'
         )
-        return redirect(url_for('admin.dokumen', sub_kamar_id=dok.sub_kamar_id))
+        return redirect(url_for('admin.dokumen') + '?sub_kamar_id=' + str(dok.sub_kamar_id))
 
     # Jika aman, hapus semua share_links (yang sudah expired atau inactive)
     ShareLink.query.filter_by(dokumen_id=dok_id).delete()
@@ -308,7 +308,7 @@ def dokumen_hapus(dok_id):
     clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=kamar_id)
 
     flash(f'Dokumen "{judul}" berhasil dihapus.', 'success')
-    return redirect(url_for('admin.dokumen', sub_kamar_id=sub_kamar_id))
+    return redirect(url_for('admin.dokumen') + '?sub_kamar_id=' + str(sub_kamar_id))
 
 # ===== USER =====
 @admin_bp.route('/user')
