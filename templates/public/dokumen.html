@@ -185,6 +185,12 @@
               </td>
               <td class="px-6 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
+                  {% if dok.visibilitas == 'internal' and not current_user.is_authenticated %}
+                  <a href="{{ url_for('auth.login') }}"
+                     class="inline-flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
+                    <span class="material-icons-round" style="font-size:14px;">lock</span> Login untuk Akses
+                  </a>
+                  {% else %}
                   <a href="{{ url_for('public.serve_pdf', filename=dok.file_path) }}" target="_blank"
                      class="inline-flex items-center gap-1.5 bg-hijau-600 hover:bg-hijau-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
                     <span class="material-icons-round" style="font-size:14px;">visibility</span> Preview
@@ -193,6 +199,7 @@
                      class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
                     <span class="material-icons-round" style="font-size:14px;">download</span> Unduh
                   </a>
+                  {% endif %}
                 </div>
               </td>
             </tr>
@@ -244,6 +251,12 @@
 
         <!-- Tombol aksi -->
         <div class="flex gap-2">
+          {% if dok.visibilitas == 'internal' and not current_user.is_authenticated %}
+          <a href="{{ url_for('auth.login') }}"
+             class="flex-1 flex items-center justify-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-semibold px-3 py-2 rounded-xl transition-all">
+            <span class="material-icons-round" style="font-size:14px;">lock</span> Login untuk Akses
+          </a>
+          {% else %}
           <a href="{{ url_for('public.serve_pdf', filename=dok.file_path) }}" target="_blank"
              class="flex-1 flex items-center justify-center gap-1.5 bg-hijau-600 hover:bg-hijau-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all">
             <span class="material-icons-round" style="font-size:14px;">visibility</span> Preview
@@ -252,6 +265,7 @@
              class="flex-1 flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all">
             <span class="material-icons-round" style="font-size:14px;">download</span> Unduh
           </a>
+          {% endif %}
         </div>
       </div>
       {% endfor %}
