@@ -111,8 +111,6 @@ def dokumen(kamar_id, sub_kamar_id):
     # Base query
     query = Dokumen.query.filter_by(sub_kamar_id=sub_kamar_id)
 
-    if not current_user.is_authenticated:
-        query = query.filter_by(visibilitas='publik')
 
     if cari:
         query = query.filter(
@@ -139,8 +137,6 @@ def dokumen(kamar_id, sub_kamar_id):
     tahun_query = db.session.query(
         db.distinct(db.extract('year', Dokumen.created_at))
     ).filter(Dokumen.sub_kamar_id == sub_kamar_id)
-    if not current_user.is_authenticated:
-        tahun_query = tahun_query.filter(Dokumen.visibilitas == 'publik')
     tahun_list = sorted(
         [int(t[0]) for t in tahun_query.all() if t[0]], reverse=True
     )

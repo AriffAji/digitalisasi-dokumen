@@ -53,24 +53,54 @@
 
   <!-- Filter Sub-Kamar -->
   {% if sub_kamar_list %}
-  <div class="flex flex-wrap gap-2 mb-6">
+  <div class="flex items-center gap-2 mb-6">
+    <!-- Semua Sub-Kamar (fixed) -->
     <a href="{{ url_for('superadmin.dokumen', kamar_id=kamar_id) }}"
-       class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all
+       class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0
               {{ 'bg-gray-800 text-white' if not sub_kamar_id else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-      Semua Sub-Kamar
+      Semua
     </a>
-    {% for sk in sub_kamar_list %}
-    <a href="{{ url_for('superadmin.dokumen', kamar_id=kamar_id, sub_kamar_id=sk.id) }}"
-       class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1
-              {{ 'bg-gray-800 text-white' if sub_kamar_id == sk.id else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-      <span class="material-icons-round" style="font-size:12px;">folder</span>
-      {{ sk.nama }}
-      <span class="{% if sub_kamar_id == sk.id %}bg-white/20{% else %}bg-gray-200{% endif %} text-xs px-1.5 py-0.5 rounded-full">
-        {{ sk.total_dokumen }}
-      </span>
-    </a>
-    {% endfor %}
+
+    <!-- Sub-kamar scroll container -->
+    <div class="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth" id="saSubKamarScroll">
+      {% for sk in sub_kamar_list %}
+      <a href="{{ url_for('superadmin.dokumen', kamar_id=kamar_id, sub_kamar_id=sk.id) }}"
+         title="{{ sk.nama }}"
+         class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 whitespace-nowrap shrink-0
+                {{ 'bg-gray-800 text-white' if sub_kamar_id == sk.id else 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
+         {% if sub_kamar_id == sk.id %}id="saCurrentSubKamar"{% endif %}>
+        <span class="material-icons-round" style="font-size:12px;">folder</span>
+        {{ sk.nama }}
+        <span class="{% if sub_kamar_id == sk.id %}bg-white/20{% else %}bg-gray-200{% endif %} text-xs px-1.5 py-0.5 rounded-full">
+          {{ sk.total_dokumen }}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+
+    <!-- Scroll arrows -->
+    <button onclick="document.getElementById('saSubKamarScroll').scrollBy({left: -200, behavior: 'smooth'})"
+            class="hidden sm:flex shrink-0 w-7 h-7 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 hover:text-gray-800 hover:border-gray-400 transition-all">
+      <span class="material-icons-round" style="font-size:16px;">chevron_left</span>
+    </button>
+    <button onclick="document.getElementById('saSubKamarScroll').scrollBy({left: 200, behavior: 'smooth'})"
+            class="hidden sm:flex shrink-0 w-7 h-7 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 hover:text-gray-800 hover:border-gray-400 transition-all">
+      <span class="material-icons-round" style="font-size:16px;">chevron_right</span>
+    </button>
   </div>
+
+  <!-- Auto-scroll ke current sub-kamar -->
+  <script>
+    (function() {
+      const el = document.getElementById('saCurrentSubKamar');
+      if (el) el.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    })();
+  </script>
+
+  <style>
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
   {% endif %}
 
   <!-- Tabel Dokumen -->
