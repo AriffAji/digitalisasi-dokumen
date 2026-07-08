@@ -25,35 +25,35 @@
 
   <!-- Statistik -->
   <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-md p-5">
       <div class="bg-hijau-50 rounded-xl p-2.5 w-fit mb-3">
         <span class="material-icons-round text-hijau-600" style="font-size:22px;">description</span>
       </div>
       <div class="text-3xl font-black text-gray-800">{{ total_dokumen }}</div>
       <div class="text-gray-500 text-xs font-medium mt-1">Total Dokumen</div>
     </div>
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-md p-5">
       <div class="bg-blue-50 rounded-xl p-2.5 w-fit mb-3">
         <span class="material-icons-round text-blue-500" style="font-size:22px;">meeting_room</span>
       </div>
       <div class="text-3xl font-black text-gray-800">{{ kamar_aktif }}</div>
       <div class="text-gray-500 text-xs font-medium mt-1">Kamar Aktif</div>
     </div>
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-md p-5">
       <div class="bg-purple-50 rounded-xl p-2.5 w-fit mb-3">
         <span class="material-icons-round text-purple-500" style="font-size:22px;">manage_accounts</span>
       </div>
       <div class="text-3xl font-black text-gray-800">{{ total_admin }}</div>
       <div class="text-gray-500 text-xs font-medium mt-1">Total Admin</div>
     </div>
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-md p-5">
       <div class="bg-orange-50 rounded-xl p-2.5 w-fit mb-3">
         <span class="material-icons-round text-orange-500" style="font-size:22px;">people</span>
       </div>
       <div class="text-3xl font-black text-gray-800">{{ total_user }}</div>
       <div class="text-gray-500 text-xs font-medium mt-1">User Kepegawaian</div>
     </div>
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-md p-5">
       <div class="bg-pink-50 rounded-xl p-2.5 w-fit mb-3">
         <span class="material-icons-round text-pink-500" style="font-size:22px;">upload_file</span>
       </div>
@@ -62,15 +62,18 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- ===== FIX UI: ALIGN HEIGHT START ===== -->
+
+  <!-- ROW 1: Menu Cepat + Dokumen Terbaru (sejajar tinggi) -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch mb-6">
 
     <!-- Menu Cepat -->
-    <div>
+    <div class="lg:col-span-1 flex flex-col">
       <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Menu Cepat</h2>
-      <div class="space-y-3">
+      <div class="space-y-3 flex-1 flex flex-col">
 
         <a href="{{ url_for('superadmin.admin_list') }}"
-           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
           <div class="bg-purple-50 group-hover:bg-purple-100 rounded-xl p-2.5 transition-colors">
             <span class="material-icons-round text-purple-500" style="font-size:22px;">manage_accounts</span>
           </div>
@@ -82,7 +85,7 @@
         </a>
 
         <a href="{{ url_for('superadmin.kamar') }}"
-           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
           <div class="bg-blue-50 group-hover:bg-blue-100 rounded-xl p-2.5 transition-colors">
             <span class="material-icons-round text-blue-500" style="font-size:22px;">meeting_room</span>
           </div>
@@ -94,7 +97,7 @@
         </a>
 
         <a href="{{ url_for('superadmin.dokumen') }}"
-           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
           <div class="bg-hijau-50 group-hover:bg-hijau-100 rounded-xl p-2.5 transition-colors">
             <span class="material-icons-round text-hijau-600" style="font-size:22px;">upload_file</span>
           </div>
@@ -106,7 +109,7 @@
         </a>
 
         <a href="{{ url_for('superadmin.log_viewer') }}"
-           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
           <div class="bg-orange-50 group-hover:bg-orange-100 rounded-xl p-2.5 transition-colors">
             <span class="material-icons-round text-orange-500" style="font-size:22px;">history</span>
           </div>
@@ -118,7 +121,7 @@
         </a>
 
         <a href="{{ url_for('public.index') }}" target="_blank"
-           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+           class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
           <div class="bg-gray-50 group-hover:bg-gray-100 rounded-xl p-2.5 transition-colors">
             <span class="material-icons-round text-gray-500" style="font-size:22px;">open_in_new</span>
           </div>
@@ -130,17 +133,56 @@
         </a>
 
       </div>
+    </div>
 
-      <!-- Status Kamar -->
-      <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 mt-6">Status Kamar</h2>
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <!-- Dokumen Terbaru -->
+    <div class="lg:col-span-2 flex flex-col">
+      <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Dokumen Terbaru</h2>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden flex-1 flex flex-col">
+        {% if dokumen_terbaru %}
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Judul</th>
+              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Kamar</th>
+              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Tanggal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            {% for dok in dokumen_terbaru %}
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-3 font-medium text-gray-800">{{ dok.judul }}</td>
+              <td class="px-5 py-3 text-gray-500 text-xs">{{ dok.sub_kamar.kamar.nama }}</td>
+              <td class="px-5 py-3 text-gray-400 text-xs">{{ dok.created_at.strftime('%d %b %Y') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-10">
+          <span class="material-icons-round text-gray-200" style="font-size:40px;">description</span>
+          <p class="text-gray-400 text-sm mt-2">Belum ada dokumen.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: Status Kamar + Daftar Admin (sejajar tinggi) -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+
+    <!-- Status Kamar -->
+    <div class="lg:col-span-1 flex flex-col">
+      <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Status Kamar</h2>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden flex-1">
         {% for k in kamar_list %}
         <div class="flex items-center justify-between px-4 py-3 {{ 'border-b border-gray-50' if not loop.last }}">
           <div class="flex items-center gap-2">
             <span class="material-icons-round {{ 'text-hijau-500' if k.status == 'aktif' else 'text-gray-300' }}" style="font-size:18px;">
               {{ 'folder_special' if k.status == 'aktif' else 'folder' }}
             </span>
-            <span class="text-sm font-medium text-gray-700 truncate max-w-[140px]">{{ k.nama }}</span>
+            <span class="text-sm font-medium text-gray-700">{{ k.nama }}</span>
           </div>
           {% if k.status == 'aktif' %}
           <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">Aktif</span>
@@ -152,90 +194,55 @@
       </div>
     </div>
 
-    <!-- Dokumen Terbaru + Admin List -->
-    <div class="lg:col-span-2 space-y-6">
-
-      <!-- Dokumen Terbaru -->
-      <div>
-        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Dokumen Terbaru</h2>
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          {% if dokumen_terbaru %}
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-gray-50 border-b border-gray-100">
-                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Judul</th>
-                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Kamar</th>
-                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Tanggal</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-              {% for dok in dokumen_terbaru %}
-              <tr class="hover:bg-gray-50 transition-colors">
-                <td class="px-5 py-3 font-medium text-gray-800 truncate max-w-[160px]">{{ dok.judul }}</td>
-                <td class="px-5 py-3 text-gray-500 text-xs">{{ dok.sub_kamar.kamar.nama }}</td>
-                <td class="px-5 py-3 text-gray-400 text-xs">{{ dok.created_at.strftime('%d %b %Y') }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          <div class="text-center py-10">
-            <span class="material-icons-round text-gray-200" style="font-size:40px;">description</span>
-            <p class="text-gray-400 text-sm mt-2">Belum ada dokumen.</p>
-          </div>
-          {% endif %}
+    <!-- Daftar Admin -->
+    <div class="lg:col-span-2 flex flex-col">
+      <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Daftar Admin</h2>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden flex-1 flex flex-col">
+        {% if admin_list %}
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Nama</th>
+              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Kamar</th>
+              <th class="px-5 py-3 text-center text-xs font-bold text-gray-400 uppercase">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            {% for a in admin_list %}
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-3 font-medium text-gray-800">{{ a.nama }}</td>
+              <td class="px-5 py-3 text-gray-500 text-xs">{{ a.kamar.nama if a.kamar else '—' }}</td>
+              <td class="px-5 py-3 text-center">
+                {% if a.is_active %}
+                <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Aktif</span>
+                {% else %}
+                <span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-full">Nonaktif</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="px-5 py-3 border-t border-gray-50 mt-auto">
+          <a href="{{ url_for('superadmin.admin_list') }}" class="text-hijau-600 text-xs font-semibold hover:underline flex items-center gap-1">
+            Kelola semua admin
+            <span class="material-icons-round" style="font-size:14px;">arrow_forward</span>
+          </a>
         </div>
-      </div>
-
-      <!-- Admin Aktif -->
-      <div>
-        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Daftar Admin</h2>
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          {% if admin_list %}
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-gray-50 border-b border-gray-100">
-                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Nama</th>
-                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Kamar</th>
-                <th class="px-5 py-3 text-center text-xs font-bold text-gray-400 uppercase">Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-              {% for a in admin_list %}
-              <tr class="hover:bg-gray-50 transition-colors">
-                <td class="px-5 py-3 font-medium text-gray-800">{{ a.nama }}</td>
-                <td class="px-5 py-3 text-gray-500 text-xs">{{ a.kamar.nama if a.kamar else '—' }}</td>
-                <td class="px-5 py-3 text-center">
-                  {% if a.is_active %}
-                  <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Aktif</span>
-                  {% else %}
-                  <span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-full">Nonaktif</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          <div class="px-5 py-3 border-t border-gray-50">
-            <a href="{{ url_for('superadmin.admin_list') }}" class="text-hijau-600 text-xs font-semibold hover:underline flex items-center gap-1">
-              Kelola semua admin
-              <span class="material-icons-round" style="font-size:14px;">arrow_forward</span>
-            </a>
-          </div>
-          {% else %}
-          <div class="text-center py-10">
-            <span class="material-icons-round text-gray-200" style="font-size:40px;">manage_accounts</span>
-            <p class="text-gray-400 text-sm mt-2">Belum ada admin.</p>
-            <a href="{{ url_for('superadmin.admin_list') }}"
-               class="inline-flex items-center gap-1 text-hijau-600 text-xs font-semibold hover:underline mt-2">
-              Tambah admin sekarang
-            </a>
-          </div>
-          {% endif %}
+        {% else %}
+        <div class="text-center py-10">
+          <span class="material-icons-round text-gray-200" style="font-size:40px;">manage_accounts</span>
+          <p class="text-gray-400 text-sm mt-2">Belum ada admin.</p>
+          <a href="{{ url_for('superadmin.admin_list') }}"
+             class="inline-flex items-center gap-1 text-hijau-600 text-xs font-semibold hover:underline mt-2">
+            Tambah admin sekarang
+          </a>
         </div>
+        {% endif %}
       </div>
-
     </div>
+
   </div>
+  <!-- ===== FIX UI: ALIGN HEIGHT END ===== -->
 </div>
 {% endblock %}
