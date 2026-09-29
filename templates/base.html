@@ -21,6 +21,8 @@
   <!-- AOS (Animate On Scroll) -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
 
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/border-glow-siadik.css') }}">
+
   <script>
     // Tailwind custom config warna PPNP
     tailwind.config = {
@@ -394,8 +396,10 @@
         }, 16);
       });
     });
-  </script>
+    </script>
+    <script src="{{ url_for('static', filename='js/border-glow-siadik.js') }}"></script>
 
   {% block extra_js %}{% endblock %}
+
 </body>
 </html>

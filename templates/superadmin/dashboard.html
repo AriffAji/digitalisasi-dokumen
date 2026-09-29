@@ -64,6 +64,8 @@
 
   <!-- ===== FIX UI: ALIGN HEIGHT START ===== -->
 
+  <!-- ===== FIX UI: ALIGN HEIGHT START ===== -->
+
   <!-- ROW 1: Menu Cepat + Dokumen Terbaru (sejajar tinggi) -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch mb-6">
 
@@ -140,28 +142,32 @@
       <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Dokumen Terbaru</h2>
       <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden flex-1 flex flex-col">
         {% if dokumen_terbaru %}
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="bg-gray-50 border-b border-gray-100">
-              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Judul</th>
-              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Kamar</th>
-              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Tanggal</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-50">
-            {% for dok in dokumen_terbaru %}
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-5 py-3 font-medium text-gray-800">{{ dok.judul }}</td>
-              <td class="px-5 py-3 text-gray-500 text-xs">{{ dok.sub_kamar.kamar.nama }}</td>
-              <td class="px-5 py-3 text-gray-400 text-xs">{{ dok.created_at.strftime('%d %b %Y') }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="overflow-y-auto flex-1">
+          <table class="w-full text-sm">
+            <thead class="sticky top-0">
+              <tr class="bg-gray-50 border-b border-gray-100">
+                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Judul</th>
+                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Kamar</th>
+                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Tanggal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              {% for dok in dokumen_terbaru %}
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-5 py-3 font-medium text-gray-800">{{ dok.judul }}</td>
+                <td class="px-5 py-3 text-gray-500 text-xs">{{ dok.sub_kamar.kamar.nama }}</td>
+                <td class="px-5 py-3 text-gray-400 text-xs">{{ dok.created_at.strftime('%d %b %Y') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
         {% else %}
-        <div class="text-center py-10">
-          <span class="material-icons-round text-gray-200" style="font-size:40px;">description</span>
-          <p class="text-gray-400 text-sm mt-2">Belum ada dokumen.</p>
+        <div class="text-center py-10 flex-1 flex items-center justify-center">
+          <div>
+            <span class="material-icons-round text-gray-200" style="font-size:40px;">description</span>
+            <p class="text-gray-400 text-sm mt-2">Belum ada dokumen.</p>
+          </div>
         </div>
         {% endif %}
       </div>
@@ -169,28 +175,66 @@
 
   </div>
 
-  <!-- ROW 2: Status Kamar + Daftar Admin (sejajar tinggi) -->
+  <!-- ROW 2: Status Kamar + Sub Kamar + Daftar Admin (sejajar tinggi) -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
 
-    <!-- Status Kamar -->
+    <!-- Status Kamar + Tambah Sub Kamar -->
     <div class="lg:col-span-1 flex flex-col">
       <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Status Kamar</h2>
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden flex-1">
-        {% for k in kamar_list %}
-        <div class="flex items-center justify-between px-4 py-3 {{ 'border-b border-gray-50' if not loop.last }}">
-          <div class="flex items-center gap-2">
-            <span class="material-icons-round {{ 'text-hijau-500' if k.status == 'aktif' else 'text-gray-300' }}" style="font-size:18px;">
-              {{ 'folder_special' if k.status == 'aktif' else 'folder' }}
-            </span>
-            <span class="text-sm font-medium text-gray-700">{{ k.nama }}</span>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden flex-1 flex flex-col">
+        <div class="overflow-y-auto flex-1">
+          {% for k in kamar_list %}
+          <div class="flex items-center justify-between px-4 py-3 {{ 'border-b border-gray-50' if not loop.last }}">
+            <div class="flex items-center gap-2">
+              <span class="material-icons-round {{ 'text-hijau-500' if k.status == 'aktif' else 'text-gray-300' }}" style="font-size:18px;">
+                {{ 'folder_special' if k.status == 'aktif' else 'folder' }}
+              </span>
+              <span class="text-sm font-medium text-gray-700">{{ k.nama }}</span>
+            </div>
+            {% if k.status == 'aktif' %}
+            <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">Aktif</span>
+            {% else %}
+            <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">Terkunci</span>
+            {% endif %}
           </div>
-          {% if k.status == 'aktif' %}
-          <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">Aktif</span>
+          {% endfor %}
+        </div>
+
+        <!-- Tambah Sub Kamar -->
+        <div class="px-4 py-4 border-t border-gray-100 bg-gray-50">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tambah Sub Kamar</p>
+          {% if kamar_list %}
+          <form id="form-sub-kamar" method="POST" class="flex flex-col gap-2"
+                data-action-template="{{ url_for('superadmin.sub_kamar_tambah', kamar_id=0) }}">
+            {# Kalau app pakai CSRFProtect, aktifkan baris ini: #}
+            {# <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> #}
+            <select id="sub-kamar-kamar-id" required
+                    class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="" disabled selected>Pilih kamar</option>
+              {% for k in kamar_list %}
+              <option value="{{ k.id }}">{{ k.nama }}</option>
+              {% endfor %}
+            </select>
+            <input type="text" name="nama" required maxlength="100"
+                   placeholder="Nama sub kamar"
+                   class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            <button type="submit"
+                    class="inline-flex items-center justify-center gap-1 bg-hijau-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90">
+              <span class="material-icons-round" style="font-size:14px;">add</span>
+              Sub Kamar
+            </button>
+          </form>
+          <script>
+            document.getElementById('form-sub-kamar').addEventListener('submit', function (e) {
+              var id = document.getElementById('sub-kamar-kamar-id').value;
+              if (!id) { e.preventDefault(); return; }
+              this.action = this.dataset.actionTemplate.replace('/0/', '/' + id + '/');
+            });
+          </script>
           {% else %}
-          <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">Terkunci</span>
+          <p class="text-gray-400 text-xs">Belum ada kamar.</p>
           {% endif %}
         </div>
-        {% endfor %}
       </div>
     </div>
 
@@ -199,30 +243,32 @@
       <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Daftar Admin</h2>
       <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden flex-1 flex flex-col">
         {% if admin_list %}
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="bg-gray-50 border-b border-gray-100">
-              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Nama</th>
-              <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Kamar</th>
-              <th class="px-5 py-3 text-center text-xs font-bold text-gray-400 uppercase">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-50">
-            {% for a in admin_list %}
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-5 py-3 font-medium text-gray-800">{{ a.nama }}</td>
-              <td class="px-5 py-3 text-gray-500 text-xs">{{ a.kamar.nama if a.kamar else '—' }}</td>
-              <td class="px-5 py-3 text-center">
-                {% if a.is_active %}
-                <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Aktif</span>
-                {% else %}
-                <span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-full">Nonaktif</span>
-                {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="overflow-y-auto flex-1">
+          <table class="w-full text-sm">
+            <thead class="sticky top-0">
+              <tr class="bg-gray-50 border-b border-gray-100">
+                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Nama</th>
+                <th class="px-5 py-3 text-left text-xs font-bold text-gray-400 uppercase">Kamar</th>
+                <th class="px-5 py-3 text-center text-xs font-bold text-gray-400 uppercase">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              {% for a in admin_list %}
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-5 py-3 font-medium text-gray-800">{{ a.nama }}</td>
+                <td class="px-5 py-3 text-gray-500 text-xs">{{ a.kamar.nama if a.kamar else '—' }}</td>
+                <td class="px-5 py-3 text-center">
+                  {% if a.is_active %}
+                  <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Aktif</span>
+                  {% else %}
+                  <span class="bg-gray-100 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-full">Nonaktif</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
         <div class="px-5 py-3 border-t border-gray-50 mt-auto">
           <a href="{{ url_for('superadmin.admin_list') }}" class="text-hijau-600 text-xs font-semibold hover:underline flex items-center gap-1">
             Kelola semua admin
@@ -230,13 +276,15 @@
           </a>
         </div>
         {% else %}
-        <div class="text-center py-10">
-          <span class="material-icons-round text-gray-200" style="font-size:40px;">manage_accounts</span>
-          <p class="text-gray-400 text-sm mt-2">Belum ada admin.</p>
-          <a href="{{ url_for('superadmin.admin_list') }}"
-             class="inline-flex items-center gap-1 text-hijau-600 text-xs font-semibold hover:underline mt-2">
-            Tambah admin sekarang
-          </a>
+        <div class="text-center py-10 flex-1 flex items-center justify-center">
+          <div>
+            <span class="material-icons-round text-gray-200" style="font-size:40px;">manage_accounts</span>
+            <p class="text-gray-400 text-sm mt-2">Belum ada admin.</p>
+            <a href="{{ url_for('superadmin.admin_list') }}"
+               class="inline-flex items-center gap-1 text-hijau-600 text-xs font-semibold hover:underline mt-2">
+              Tambah admin sekarang
+            </a>
+          </div>
         </div>
         {% endif %}
       </div>

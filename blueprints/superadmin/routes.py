@@ -173,6 +173,70 @@ def kamar_hapus(kamar_id):
     flash(f'Kamar "{nama}" berhasil dihapus.', 'success')
     return redirect(url_for('superadmin.kamar'))
 
+# ===== SUB KAMAR MANAGEMENT =====
+@superadmin_bp.route('/kamar/<int:kamar_id>/sub-kamar/tambah', methods=['POST'])
+@superadmin_required
+def sub_kamar_tambah(kamar_id):
+    """Tambah sub-kamar baru di kamar tertentu."""
+    kamar = Kamar.query.get_or_404(kamar_id)
+    nama  = request.form.get('nama', '').strip()
+
+    if not nama:
+        flash('Nama sub kamar tidak boleh kosong.', 'danger')
+        return redirect(url_for('superadmin.kamar'))
+
+    if len(nama) > 100:
+        flash('Nama sub kamar maksimal 100 karakter.', 'danger')
+        return redirect(url_for('superadmin.kamar'))
+
+    # Cegah nama dobel dalam kamar yang sama (case-insensitive)
+    sudah_ada = SubKamar.query.filter(
+        SubKamar.kamar_id == kamar_id,
+        db.func.lower(SubKamar.nama) == nama.lower()
+    ).first()
+    if sudah_ada:
+        flash(f'Sub kamar "{nama}" sudah ada di kamar "{kamar.nama}".', 'danger')
+        return redirect(url_for('superadmin.kamar'))
+
+    sk = SubKamar(nama=nama, kamar_id=kamar_id)
+    db.session.add(sk)
+    db.session.commit()
+
+    current_app.logger.info(
+        f'TAMBAH SUB KAMAR (SA): {current_user.email} | sub_kamar="{nama}" | kamar="{kamar.nama}"'
+    )
+    from blueprints.public.routes import clear_dokumen_cache
+    clear_dokumen_cache(sub_kamar_id=sk.id, kamar_id=kamar_id)
+
+    flash(f'Sub kamar "{nama}" berhasil ditambahkan di kamar "{kamar.nama}". Silakan upload dokumen.', 'success')
+    # Langsung ke halaman dokumen, terfilter ke sub kamar baru
+    return redirect(url_for('superadmin.dokumen', kamar_id=kamar_id, sub_kamar_id=sk.id))
+
+
+@superadmin_bp.route('/sub-kamar/<int:sub_kamar_id>/hapus', methods=['POST'])
+@superadmin_required
+def sub_kamar_hapus(sub_kamar_id):
+    """Hapus sub-kamar (hanya jika kosong)."""
+    sk = SubKamar.query.get_or_404(sub_kamar_id)
+    kamar_id = sk.kamar_id
+
+    if Dokumen.query.filter_by(sub_kamar_id=sub_kamar_id).count() > 0:
+        flash(f'Sub kamar "{sk.nama}" masih memiliki dokumen. Tidak bisa dihapus.', 'danger')
+        return redirect(url_for('superadmin.kamar'))
+
+    nama = sk.nama
+    db.session.delete(sk)
+    db.session.commit()
+
+    current_app.logger.warning(
+        f'HAPUS SUB KAMAR (SA): {current_user.email} | sub_kamar="{nama}"'
+    )
+    from blueprints.public.routes import clear_dokumen_cache
+    clear_dokumen_cache(sub_kamar_id=sub_kamar_id, kamar_id=kamar_id)
+
+    flash(f'Sub kamar "{nama}" berhasil dihapus.', 'success')
+    return redirect(url_for('superadmin.kamar'))   
+
 
 # ===== ADMIN MANAGEMENT =====
 @superadmin_bp.route('/admin-list')
