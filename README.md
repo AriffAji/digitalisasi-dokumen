@@ -159,11 +159,11 @@ dokumen      → id, sub_kamar_id, nomor_dokumen, judul, file_path,
 - [x] Phase 2 — Sistem autentikasi multi-role
 - [x] Phase 3 — Halaman publik + filter dokumen
 - [x] Phase 4 — Panel admin (upload, sub-kamar, user)
-- [x] Phase 5 — Panel superadmin (kamar, admin)
+- [x] Phase 5 — Panel superadmin (kamar, admin, sub-kamar)
 - [x] Phase 6 — Keamanan (.env + SECRET_KEY)
 - [ ] Migrasi SQLite → MariaDB (Agustus 2026)
-- [ ] Deploy ke VPS Hostinger (Agustus 2026)
-- [ ] Aktivasi kamar Perencanaan, Keuangan, BMN, Kasubag Umum
+- [x] Deploy ke VPS Hostinger (Agustus 2026)
+- [x] Aktivasi kamar Perencanaan, Keuangan, BMN, Kasubag Umum
 
 ---
 
