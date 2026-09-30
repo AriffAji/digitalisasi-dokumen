@@ -174,20 +174,31 @@ def kamar_hapus(kamar_id):
     return redirect(url_for('superadmin.kamar'))
 
 # ===== SUB KAMAR MANAGEMENT =====
+@superadmin_bp.route('/sub-kamar/tambah', methods=['POST'])
 @superadmin_bp.route('/kamar/<int:kamar_id>/sub-kamar/tambah', methods=['POST'])
 @superadmin_required
-def sub_kamar_tambah(kamar_id):
-    """Tambah sub-kamar baru di kamar tertentu."""
+def sub_kamar_tambah(kamar_id=None):
+    """Tambah sub-kamar baru. kamar_id dari URL (lama) atau dari form (dashboard)."""
+    if kamar_id is None:
+        kamar_id = request.form.get('kamar_id', type=int)
+
+    # Kalau gagal, balik ke halaman asal (dashboard / kamar)
+    balik = request.referrer or url_for('superadmin.kamar')
+
+    if not kamar_id:
+        flash('Pilih kamar terlebih dahulu.', 'danger')
+        return redirect(balik)
+
     kamar = Kamar.query.get_or_404(kamar_id)
     nama  = request.form.get('nama', '').strip()
 
     if not nama:
         flash('Nama sub kamar tidak boleh kosong.', 'danger')
-        return redirect(url_for('superadmin.kamar'))
+        return redirect(balik)
 
     if len(nama) > 100:
         flash('Nama sub kamar maksimal 100 karakter.', 'danger')
-        return redirect(url_for('superadmin.kamar'))
+        return redirect(balik)
 
     # Cegah nama dobel dalam kamar yang sama (case-insensitive)
     sudah_ada = SubKamar.query.filter(
@@ -196,7 +207,7 @@ def sub_kamar_tambah(kamar_id):
     ).first()
     if sudah_ada:
         flash(f'Sub kamar "{nama}" sudah ada di kamar "{kamar.nama}".', 'danger')
-        return redirect(url_for('superadmin.kamar'))
+        return redirect(balik)
 
     sk = SubKamar(nama=nama, kamar_id=kamar_id)
     db.session.add(sk)
@@ -211,7 +222,6 @@ def sub_kamar_tambah(kamar_id):
     flash(f'Sub kamar "{nama}" berhasil ditambahkan di kamar "{kamar.nama}". Silakan upload dokumen.', 'success')
     # Langsung ke halaman dokumen, terfilter ke sub kamar baru
     return redirect(url_for('superadmin.dokumen', kamar_id=kamar_id, sub_kamar_id=sk.id))
-
 
 @superadmin_bp.route('/sub-kamar/<int:sub_kamar_id>/hapus', methods=['POST'])
 @superadmin_required

@@ -1,0 +1,25 @@
+# Testing dependencies for SIADIK
+# Install with: pip install -r requirements-test.txt
+
+# Core testing framework
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-timeout==2.2.0
+pytest-flask==1.3.0
+
+# Flask and extensions (from main requirements)
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+Flask-Caching==2.1.0
+
+# Database
+SQLAlchemy==2.0.23
+
+# Utilities
+python-dotenv==1.0.0
+Werkzeug==3.0.1
+
+# Code quality
+pytest-mock==3.12.0
