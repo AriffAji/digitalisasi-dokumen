@@ -115,6 +115,25 @@ def log_viewer():
         filter      = filter_type,
     )
 
+# ===== SUB KAMAR LIST PAGE =====
+@superadmin_bp.route('/sub-kamar')
+@superadmin_required
+def sub_kamar_list():
+    """Halaman list semua sub kamar dengan opsi delete."""
+    sub_kamar_list = (
+        db.session.query(SubKamar, Kamar)
+        .join(Kamar, SubKamar.kamar_id == Kamar.id)
+        .order_by(Kamar.urutan, SubKamar.nama)
+        .all()
+    )
+    
+    # Hitung dokumen per sub kamar
+    sub_kamar_with_count = []
+    for sk, kamar in sub_kamar_list:
+        dok_count = Dokumen.query.filter_by(sub_kamar_id=sk.id).count()
+        sub_kamar_with_count.append((sk, kamar, dok_count))
+    
+    return render_template('superadmin/sub_kamar.html', sub_kamar_list=sub_kamar_with_count)
 
 # ===== KAMAR MANAGEMENT =====
 @superadmin_bp.route('/kamar')

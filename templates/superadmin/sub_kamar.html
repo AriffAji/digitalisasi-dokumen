@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Kelola Sub Kamar - Superadmin{% endblock %}
+
+{% block breadcrumb %}
+<div style="background-color: #fff; border-bottom: 1px solid #e5e7eb;">
+  <div style="max-width: 80rem; margin: 0 auto; padding: 12px 16px; font-size: 14px;">
+    <nav style="display: flex; align-items: center; gap: 8px; color: #6b7280;">
+      <span style="font-family: 'Material Icons Round'; font-size: 16px;">folder</span>
+      <span style="color: #059669; font-weight: 600;">Kelola Sub Kamar</span>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 80rem; margin: 0 auto; padding: 32px 16px;">
+
+  <!-- Header -->
+  <div style="margin-bottom: 32px;">
+    <h1 style="font-size: 24px; font-weight: 800; color: #1f2937; margin-bottom: 8px;">
+      Kelola Sub Kamar
+    </h1>
+    <p style="font-size: 14px; color: #6b7280;">
+      Daftar semua sub kamar. Klik tombol hapus untuk menghapus (hanya jika kosong dokumen).
+    </p>
+  </div>
+
+  <!-- Alert Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+      <div style="margin-bottom: 16px; padding: 12px 16px; border-radius: 6px; font-size: 14px; {% if category == 'success' %}background-color: #dcfce7; color: #166534;{% else %}background-color: #fee2e2; color: #991b1b;{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Table -->
+  <div style="background-color: #fff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+    {% if sub_kamar_list %}
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <thead style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+        <tr>
+          <th style="text-align: left; padding: 12px 16px; font-weight: 600; color: #6b7280; text-transform: uppercase; font-size: 12px;">Kamar</th>
+          <th style="text-align: left; padding: 12px 16px; font-weight: 600; color: #6b7280; text-transform: uppercase; font-size: 12px;">Sub Kamar</th>
+          <th style="text-align: center; padding: 12px 16px; font-weight: 600; color: #6b7280; text-transform: uppercase; font-size: 12px;">Dokumen</th>
+          <th style="text-align: center; padding: 12px 16px; font-weight: 600; color: #6b7280; text-transform: uppercase; font-size: 12px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+                {% for sk, kamar, dok_count in sub_kamar_list %}
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 12px 16px; color: #374151;">{{ kamar.nama }}</td>
+          <td style="padding: 12px 16px; color: #374151;">{{ sk.nama }}</td>
+          <td style="text-align: center; padding: 12px 16px; color: #6b7280;">{{ dok_count }}</td>
+          <td style="text-align: center; padding: 12px 16px;">
+            {% if dok_count == 0 %}
+            <form method="POST" action="{{ url_for('superadmin.sub_kamar_hapus', sub_kamar_id=sk.id) }}" style="display: inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" onclick="return confirm('Hapus sub kamar &quot;{{ sk.nama }}&quot;?');" style="background-color: #dc2626; color: #fff; padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                Hapus
+              </button>
+            </form>
+            {% else %}
+            <span style="display: inline-block; background-color: #fee2e2; color: #991b1b; padding: 6px 12px; border-radius: 4px; font-size: 12px;">
+              Ada {{ dok_count }} dokumen
+            </span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div style="padding: 32px 16px; text-align: center; color: #9ca3af;">
+      <p style="font-size: 14px;">Belum ada sub kamar.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

@@ -61,81 +61,96 @@
   <!-- ROW 1: Menu Cepat + Dokumen Terbaru (sejajar tinggi) -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch mb-6">
     <!-- Menu Cepat -->
-    <div class="lg:col-span-1 flex flex-col">
-      <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Menu Cepat</h2>
-      <div class="space-y-3 flex-1 flex flex-col">
-        <a
-          href="{{ url_for('superadmin.admin_list') }}"
-          class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-        >
-          <div class="bg-purple-50 group-hover:bg-purple-100 rounded-xl p-2.5 transition-colors">
-            <span class="material-icons-round text-purple-500" style="font-size: 22px">manage_accounts</span>
-          </div>
-          <div>
-            <div class="font-semibold text-gray-800 text-sm group-hover:text-purple-600 transition-colors">Kelola Admin</div>
-            <div class="text-gray-400 text-xs">Tambah & atur akun admin</div>
-          </div>
-          <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
-        </a>
+            <!-- Menu Cepat -->
+        <div class="lg:col-span-1 flex flex-col">
+          <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Menu Cepat</h2>
+          <div class="space-y-3 flex-1 flex flex-col">
+            <a
+              href="{{ url_for('superadmin.admin_list') }}"
+              class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+            >
+              <div class="bg-purple-50 group-hover:bg-purple-100 rounded-xl p-2.5 transition-colors">
+                <span class="material-icons-round text-purple-500" style="font-size: 22px">manage_accounts</span>
+              </div>
+              <div>
+                <div class="font-semibold text-gray-800 text-sm group-hover:text-purple-600 transition-colors">Kelola Admin</div>
+                <div class="text-gray-400 text-xs">Tambah & atur akun admin</div>
+              </div>
+              <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
+            </a>
 
-        <a
-          href="{{ url_for('superadmin.kamar') }}"
-          class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-        >
-          <div class="bg-blue-50 group-hover:bg-blue-100 rounded-xl p-2.5 transition-colors">
-            <span class="material-icons-round text-blue-500" style="font-size: 22px">meeting_room</span>
-          </div>
-          <div>
-            <div class="font-semibold text-gray-800 text-sm group-hover:text-blue-600 transition-colors">Kelola Kamar</div>
-            <div class="text-gray-400 text-xs">Tambah & atur kamar arsip</div>
-          </div>
-          <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
-        </a>
+            <a
+              href="{{ url_for('superadmin.kamar') }}"
+              class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+            >
+              <div class="bg-blue-50 group-hover:bg-blue-100 rounded-xl p-2.5 transition-colors">
+                <span class="material-icons-round text-blue-500" style="font-size: 22px">meeting_room</span>
+              </div>
+              <div>
+                <div class="font-semibold text-gray-800 text-sm group-hover:text-blue-600 transition-colors">Kelola Kamar</div>
+                <div class="text-gray-400 text-xs">Tambah & atur kamar arsip</div>
+              </div>
+              <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
+            </a>
 
-        <a
-          href="{{ url_for('superadmin.dokumen') }}"
-          class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-        >
-          <div class="bg-hijau-50 group-hover:bg-hijau-100 rounded-xl p-2.5 transition-colors">
-            <span class="material-icons-round text-hijau-600" style="font-size: 22px">upload_file</span>
-          </div>
-          <div>
-            <div class="font-semibold text-gray-800 text-sm group-hover:text-hijau-600 transition-colors">Kelola Dokumen</div>
-            <div class="text-gray-400 text-xs">Upload & hapus semua kamar</div>
-          </div>
-          <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
-        </a>
+            <a
+              href="{{ url_for('superadmin.dokumen') }}"
+              class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+            >
+              <div class="bg-hijau-50 group-hover:bg-hijau-100 rounded-xl p-2.5 transition-colors">
+                <span class="material-icons-round text-hijau-600" style="font-size: 22px">upload_file</span>
+              </div>
+              <div>
+                <div class="font-semibold text-gray-800 text-sm group-hover:text-hijau-600 transition-colors">Kelola Dokumen</div>
+                <div class="text-gray-400 text-xs">Upload & hapus semua kamar</div>
+              </div>
+              <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
+            </a>
 
-        <a
-          href="{{ url_for('superadmin.log_viewer') }}"
-          class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-        >
-          <div class="bg-orange-50 group-hover:bg-orange-100 rounded-xl p-2.5 transition-colors">
-            <span class="material-icons-round text-orange-500" style="font-size: 22px">history</span>
-          </div>
-          <div>
-            <div class="font-semibold text-gray-800 text-sm group-hover:text-orange-600 transition-colors">Log Aktivitas</div>
-            <div class="text-gray-400 text-xs">Pantau aktivitas sistem</div>
-          </div>
-          <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
-        </a>
+            <a
+              href="{{ url_for('superadmin.sub_kamar_list') }}"
+              class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+            >
+              <div class="bg-yellow-50 group-hover:bg-yellow-100 rounded-xl p-2.5 transition-colors">
+                <span class="material-icons-round text-yellow-600" style="font-size: 22px">folder_special</span>
+              </div>
+              <div>
+                <div class="font-semibold text-gray-800 text-sm group-hover:text-yellow-600 transition-colors">Kelola Sub Kamar</div>
+                <div class="text-gray-400 text-xs">Hapus sub kamar kosong</div>
+              </div>
+              <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
+            </a>
 
-        <a
-          href="{{ url_for('public.index') }}"
-          target="_blank"
-          class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-        >
-          <div class="bg-gray-50 group-hover:bg-gray-100 rounded-xl p-2.5 transition-colors">
-            <span class="material-icons-round text-gray-500" style="font-size: 22px">open_in_new</span>
+            <a
+              href="{{ url_for('superadmin.log_viewer') }}"
+              class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+            >
+              <div class="bg-orange-50 group-hover:bg-orange-100 rounded-xl p-2.5 transition-colors">
+                <span class="material-icons-round text-orange-500" style="font-size: 22px">history</span>
+              </div>
+              <div>
+                <div class="font-semibold text-gray-800 text-sm group-hover:text-orange-600 transition-colors">Log Aktivitas</div>
+                <div class="text-gray-400 text-xs">Pantau aktivitas sistem</div>
+              </div>
+              <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
+            </a>
+
+            <a
+              href="{{ url_for('public.index') }}"
+              target="_blank"
+              class="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-md p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+            >
+              <div class="bg-gray-50 group-hover:bg-gray-100 rounded-xl p-2.5 transition-colors">
+                <span class="material-icons-round text-gray-500" style="font-size: 22px">open_in_new</span>
+              </div>
+              <div>
+                <div class="font-semibold text-gray-800 text-sm group-hover:text-gray-600 transition-colors">Lihat Halaman Publik</div>
+                <div class="text-gray-400 text-xs">Preview tampilan pengunjung</div>
+              </div>
+              <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
+            </a>
           </div>
-          <div>
-            <div class="font-semibold text-gray-800 text-sm group-hover:text-gray-600 transition-colors">Lihat Halaman Publik</div>
-            <div class="text-gray-400 text-xs">Preview tampilan pengunjung</div>
-          </div>
-          <span class="material-icons-round text-gray-300 ml-auto">arrow_forward_ios</span>
-        </a>
-      </div>
-    </div>
+        </div>
 
     <!-- Dokumen Terbaru -->
     <div class="lg:col-span-2 flex flex-col">
