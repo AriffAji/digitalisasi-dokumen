@@ -177,7 +177,6 @@ def api_global_search():
         return jsonify([])
 
     query = Dokumen.query.filter(
-        Dokumen.visibilitas == 'publik',
         db.or_(
             Dokumen.judul.ilike(f'%{q}%'),
             Dokumen.nomor_dokumen.ilike(f'%{q}%')
@@ -199,6 +198,15 @@ def api_global_search():
 
     hasil = query.order_by(Dokumen.created_at.desc()).all()
 
+    def get_akses_message(visibilitas):
+        """Return pesan untuk user berdasarkan visibilitas."""
+        pesan = {
+            'publik':   'Tersedia untuk umum',
+            'internal': 'Dokumen internal — silakan hubungi admin untuk akses',
+            'privat':   'Dokumen pribadi — hubungi admin untuk permintaan akses'
+        }
+        return pesan.get(visibilitas, 'Tidak tersedia')
+
     return jsonify([{
         'id':           d.id,
         'judul':        d.judul,
@@ -208,8 +216,9 @@ def api_global_search():
         'status':       d.status,
         'visibilitas':  d.visibilitas,
         'tanggal':      d.created_at.strftime('%d %b %Y'),
-        'preview_url':  f'/uploads/{d.file_path}',
-        'download_url': f'/download/{d.file_path}',
+        'preview_url':  f'/uploads/{d.file_path}' if d.visibilitas == 'publik' else None,
+        'download_url': f'/download/{d.file_path}' if d.visibilitas == 'publik' else None,
+        'akses_message': get_akses_message(d.visibilitas)
     } for d in hasil])
 
 
@@ -219,7 +228,6 @@ def api_global_search_tahun():
     tahun_list = db.session.query(
         db.distinct(db.extract('year', Dokumen.created_at))
     ).filter(
-        Dokumen.visibilitas == 'publik',
         Dokumen.status == 'aktif'
     ).all()
     return jsonify(sorted([int(t[0]) for t in tahun_list if t[0]], reverse=True))
